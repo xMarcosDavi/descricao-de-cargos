@@ -29,7 +29,7 @@ a { color: inherit; }
 
 .marca { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; text-decoration: none; }
 .marca-sinal { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: white; background: var(--verde); font-size: 13px; letter-spacing: .06em; }
-.marca-logo { display: block; width: 92px; height: 64px; object-fit: cover; object-position: center; background: white; border: 1px solid var(--linha); border-radius: 10px; }
+.marca-logo { display: block; width: 64px; height: 64px; object-fit: cover; object-position: center; background: white; border: 1px solid var(--linha); border-radius: 50%; }
 nav { display: flex; align-items: center; gap: 28px; }
 nav > a { font-size: 14px; font-weight: 650; text-decoration: none; }
 
@@ -103,7 +103,7 @@ footer { display: flex; justify-content: space-between; gap: 25px; padding: 28px
 @media (max-width: 560px) {
   .topo, .hero, .secao { width: min(100% - 28px, 1100px); }
   .topo { min-height: 72px; }
-  .marca-logo { width: 78px; height: 54px; }
+  .marca-logo { width: 54px; height: 54px; }
   .marca > span:last-child { display: none; }
   .hero { margin-bottom: 50px; }
   h1 { font-size: 44px; }
