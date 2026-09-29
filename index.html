@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Descrição de Cargos | Marcos Davi</title>
+  <meta name="description" content="Descrição de Cargos: projeto de Marcos Davi para criar, revisar e organizar descrições profissionais com apoio de IA.">
+  <meta property="og:title" content="Descrição de Cargos | Marcos Davi">
+  <meta property="og:description" content="Da definição do cargo à descrição organizada: conheça o projeto e suas telas.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="styles.css">
+  <script src="vitrine.js" defer></script>
+</head>
+<body>
+  <header class="topo">
+    <a class="marca" href="#inicio" aria-label="Descrição de Cargos — início">
+      <span class="marca-sinal" aria-hidden="true">DC</span>
+      <span>Descrição de Cargos</span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="#produto">Produto</a>
+      <a href="#demonstracao">Demonstração</a>
+      <a href="#recursos">Recursos</a>
+      <a class="botao botao-menor" href="https://www.linkedin.com/in/marcosdavi-adm/" target="_blank" rel="noopener noreferrer">Falar com Marcos</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-texto">
+        <p class="rotulo">PROJETO DE PORTFÓLIO · MARCOS DAVI</p>
+        <h1>Cargos mais claros.<br>Gestão mais simples.</h1>
+        <p class="hero-resumo">Uma aplicação que conecta descrições de cargos, análise de complexidade, grading e referências salariais para apoiar a gestão de cargos e salários.</p>
+        <div class="acoes">
+          <a class="botao" href="https://www.linkedin.com/in/marcosdavi-adm/" target="_blank" rel="noopener noreferrer">Conversar sobre o projeto</a>
+          <a class="link-discreto" href="#produto">Conhecer o projeto <span aria-hidden="true">↓</span></a>
+        </div>
+        <p class="nota">Demonstrações utilizam exclusivamente informações fictícias.</p>
+      </div>
+      <div class="hero-visual" aria-label="Prévia do Descrição de Cargos">
+        <div class="janela-topo" aria-hidden="true"><i></i><i></i><i></i><span>Descrição de Cargos</span></div>
+        <img src="preview.png" alt="Tela de Descrição de Cargos com o exemplo fictício de Analista de Projetos Pleno">
+      </div>
+    </section>
+
+    <section class="faixa" aria-label="Destaques do produto">
+      <span>Descrições estruturadas</span>
+      <span>Grading orientativo</span>
+      <span>Biblioteca de cargos</span>
+      <span>Pesquisa salarial por UF</span>
+    </section>
+
+    <section class="secao demonstracao" id="demonstracao">
+      <div class="demonstracao-cabecalho">
+        <div>
+          <p class="rotulo">O PROJETO EM IMAGENS</p>
+          <h2>Da descrição à análise de cargos e salários.</h2>
+        </div>
+        <p>As imagens mostram telas reais da aplicação, preenchidas com exemplos fictícios. Navegue pelas etapas para entender como cada recurso funciona.</p>
+      </div>
+      <div class="demo-controles" role="tablist" aria-label="Telas do projeto">
+        <button id="aba-descricao" class="demo-aba ativa" type="button" role="tab" aria-selected="true" aria-controls="painel-tela" tabindex="0" data-imagem="descricao.png" data-titulo="Descrição do cargo" data-texto="Objetivo, responsabilidades e requisitos reunidos em um documento estruturado, que pode ser revisado antes de salvar.">Descrição</button>
+        <button id="aba-biblioteca" class="demo-aba " type="button" role="tab" aria-selected="false" aria-controls="painel-tela" tabindex="-1" data-imagem="biblioteca.png" data-titulo="Biblioteca de descrições" data-texto="Descrições salvas no navegador, com busca, organização por área, seleção e exportação em lote.">Biblioteca</button>
+        <button id="aba-complexidade" class="demo-aba " type="button" role="tab" aria-selected="false" aria-controls="painel-tela" tabindex="-1" data-imagem="complexidade.png" data-titulo="Análise de complexidade" data-texto="Painel orientativo para explorar as dimensões do cargo. O exemplo utiliza o cálculo local da aplicação.">Complexidade</button>
+        <button id="aba-grading" class="demo-aba" type="button" role="tab" aria-selected="false" aria-controls="painel-tela" tabindex="-1" data-imagem="grading.png" data-titulo="Grading do cargo" data-texto="Leituras conceituais de Korn Ferry/Hay e Mercer IPE ajudam a discutir o posicionamento do cargo a partir de suas responsabilidades. Exemplo fictício, sem classificação oficial.">Grading</button>
+        <button id="aba-salarios" class="demo-aba" type="button" role="tab" aria-selected="false" aria-controls="painel-tela" tabindex="-1" data-imagem="salarios.png" data-titulo="Pesquisa salarial" data-texto="Média nacional, faixa indicativa e comparação por UF. Os valores desta imagem são fictícios e ilustram a apresentação dos resultados.">Pesquisa salarial</button>
+      </div>
+      <figure class="demo-palco" id="painel-tela" role="tabpanel" aria-labelledby="aba-descricao" tabindex="0" aria-live="polite">
+        <figcaption>
+          <strong id="demo-titulo">Descrição do cargo</strong>
+          <span id="demo-texto">Objetivo, responsabilidades e requisitos reunidos em um documento estruturado, que pode ser revisado antes de salvar.</span>
+        </figcaption>
+        <div class="demo-imagem">
+          <img id="demo-imagem" src="descricao.png" alt="Descrição de Analista de Projetos Pleno com dados fictícios">
+          <span class="marca-agua" aria-hidden="true">DEMONSTRAÇÃO · MARCOS DAVI</span>
+        </div>
+      </figure>
+      <p class="nota">As análises são estimativas orientativas. As telas desta apresentação usam apenas dados fictícios, sem marcas corporativas.</p>
+    </section>
+
+    <section class="secao produto" id="produto">
+      <div>
+        <p class="rotulo">VISÃO DO PRODUTO</p>
+        <h2>Da definição do cargo a uma referência para a equipe.</h2>
+      </div>
+      <div class="produto-texto">
+        <p>Descrever um cargo exige clareza sobre seu objetivo, suas entregas e os conhecimentos necessários. O projeto concentra essas informações em um fluxo de criação, revisão e organização.</p>
+        <p>Informe o cargo e seu contexto, gere uma primeira versão com IA e revise o conteúdo. Depois, salve na biblioteca e prepare o documento para compartilhar. A revisão humana faz parte do processo.</p>
+      </div>
+    </section>
+
+    <section class="secao" id="recursos">
+      <p class="rotulo">CAPACIDADES</p>
+      <h2>Recursos que acompanham cada etapa.</h2>
+      <div class="grade"><article><span class="numero">01</span><h3>Criação com contexto</h3><p>Combina o nome do cargo e informações da área para apoiar a geração de uma descrição com IA.</p></article><article><span class="numero">02</span><h3>Revisão do conteúdo</h3><p>Permite editar objetivo, responsabilidades, formação, experiência e conhecimentos.</p></article><article><span class="numero">03</span><h3>Biblioteca organizada</h3><p>Reúne descrições em pastas, com busca e seleção para impressão ou exportação em lote.</p></article><article><span class="numero">04</span><h3>Cargos e salários</h3><p>Relaciona a leitura do cargo a painéis de complexidade, grading e pesquisa salarial, com comparação regional por UF.</p></article></div>
+    </section>
+
+    <section class="secao" id="cargos-salarios">
+      <p class="rotulo">CARGOS, GRADING E REMUNERAÇÃO</p>
+      <h2>O conteúdo do cargo dá contexto à análise salarial.</h2>
+      <p class="analises-intro">Responsabilidades, conhecimentos, autonomia e impacto ajudam a compreender o tamanho do papel. O projeto reúne essa leitura e as referências de remuneração na mesma experiência, para apoiar a comparação entre cargos.</p>
+      <div class="analises-grade">
+        <article><span class="numero">01 · POSICIONAMENTO DO CARGO</span><h3>Grading: uma leitura do papel na organização.</h3><p>O painel apresenta família, carreira ou nível estimado e uma justificativa. Reúne leituras conceituais de Korn Ferry/Hay e Mercer IPE, com fatores como conhecimento, solução de problemas, responsabilidade, impacto e comunicação.</p><p>Esse enquadramento ajuda a discutir a coerência entre o escopo descrito, a senioridade e o posicionamento do cargo.</p></article>
+        <article><span class="numero">02 · REFERÊNCIA DE REMUNERAÇÃO</span><h3>Pesquisa salarial: uma visão nacional e regional.</h3><p>Apresenta média Brasil, faixa salarial indicativa e comparação entre estados. O sistema prioriza um benchmark cadastrado quando há correspondência; nos demais casos, usa uma estimativa por IA calibrada pela trilha e senioridade.</p><p>O ajuste regional utiliza índices gerais do Novo CAGED/2025. A consulta por UF permite explorar diferenças geográficas na referência de salário-base mensal.</p></article>
+      </div>
+      <div class="vinculo"><h3>Como as análises se conectam?</h3><p><strong>Descrição e complexidade → contexto comum para grading e pesquisa salarial.</strong> O grading ajuda a interpretar o posicionamento do cargo; a pesquisa salarial acrescenta uma referência de remuneração. A leitura conjunta apoia a discussão sobre coerência entre responsabilidades, nível e faixa salarial.</p><p>No funcionamento atual, não há conversão automática de grade em salário. A estimativa salarial considera o cargo, sua descrição, senioridade e complexidade; os painéis devem ser interpretados em conjunto.</p></div>
+      <p class="nota">Grading orientativo, sem equivalência oficial ou vínculo com Korn Ferry ou Mercer. As referências salariais não são uma pesquisa de mercado em tempo real; valores por UF ajustados por índice não representam médias oficiais específicas do cargo.</p>
+    </section>
+
+    <section class="secao tecnologia">
+      <div>
+        <p class="rotulo">CONSTRUÇÃO</p>
+        <h2>Produto criado do conceito à implementação.</h2>
+      </div>
+      <ul>
+        <li>Arquitetura modular</li>
+        <li>JavaScript, HTML e CSS</li>
+        <li>Integração com IA via Groq</li>
+        <li>Impressão e exportação em PDF</li>
+        <li>Biblioteca no navegador</li>
+        <li>Testes e validações automatizadas</li>
+      </ul>
+    </section>
+
+    <section class="convite">
+      <p class="rotulo">APRESENTAÇÃO</p>
+      <h2>Veja como funciona na prática.</h2>
+      <p>Abra a demo e carregue o exemplo fictício para explorar a edição e a biblioteca, sem chave de IA. Para conversar sobre o projeto, entre em contato pelo LinkedIn.</p>
+      <div class="acoes"><a class="botao botao-claro" href="demo.html">Abrir demo interativa</a><a class="contato" href="https://www.linkedin.com/in/marcosdavi-adm/" target="_blank" rel="noopener noreferrer">Conversar pelo LinkedIn ↗</a></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 Marcos Davi. Todos os direitos reservados.</span>
+    <span>Descrição de Cargos · Produto em desenvolvimento</span>
+  </footer>
+</body>
+</html>
+

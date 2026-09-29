@@ -1,0 +1,3887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descrição de Cargos | Portfólio de Marcos Davi</title>
+<meta name="description" content="Aplicação de portfólio para criar, editar e organizar descrições de cargos com apoio de IA. Por Marcos Davi.">
+<style>
+/* css/base.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#C0121A;
+  --accent-light:#FFF0F0;
+  --gray-bg:#F5F5F3;
+  --gray-border:#E0DDD8;
+  --gray-text:#6B6966;
+  --text:#1A1917;
+  --row-stripe:#FAFAF8;
+}
+body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:3px solid var(--accent);padding:10px 28px;display:flex;align-items:center;gap:14px;transition:border-color .3s}
+.brand-slot{position:relative;display:inline-flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;flex-shrink:0}
+.brand-slot--topbar{width:122px;height:42px;border-radius:7px;padding:5px 10px}
+.brand-slot--doc{width:146px;height:60px;border-radius:8px;padding:7px 12px}
+.brand-logo{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+
+.topbar-logo-fallback{height:38px;min-width:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;transition:background .3s;padding:0 8px;letter-spacing:.5px}
+.topbar-info .title{font-size:17px;font-weight:700;color:var(--accent);transition:color .3s}
+.topbar-info .sub{font-size:11px;color:var(--gray-text);margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.api-key-input{height:34px;border:1.5px solid var(--gray-border);border-radius:7px;padding:0 10px;font-family:'Inter',sans-serif;font-size:12px;color:var(--text);background:#fff;outline:none;width:260px;transition:border-color .2s}
+.api-key-input:focus{border-color:var(--accent)}
+.btn-save-key{height:34px;padding:0 14px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn-save-key:hover{opacity:.85}
+.key-status{font-size:11px;color:#1B7A3E;font-weight:600;white-space:nowrap}
+.key-status.none{color:#C0392B}
+
+
+</style>
+<style>
+/* css/interface.css */
+/* EMPRESA SELECTOR */
+.empresa-bar{max-width:880px;margin:24px auto 0;padding:0 18px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--gray-text);display:block;margin-bottom:8px}
+.empresa-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:2px solid var(--gray-border);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:#fff;color:var(--gray-text)}
+.chip:hover{opacity:.85}
+.chip.active{color:#fff;border-color:transparent}
+.chip-logo{height:16px;max-width:50px;object-fit:contain;filter:grayscale(1) brightness(0.5);transition:filter .15s}
+.chip.active .chip-logo{filter:brightness(0) invert(1)}
+
+/* SEARCH */
+.search-wrap{max-width:880px;margin:20px auto 0;padding:0 18px}
+.search-row{display:flex;gap:8px}
+.search-row input{flex:1;height:46px;border:1.5px solid var(--gray-border);border-radius:8px;padding:0 14px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
+.search-row input:focus{border-color:var(--accent)}
+.btn-gerar{height:46px;padding:0 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-gerar:hover{opacity:.88}
+.btn-gerar:disabled{opacity:.45;cursor:not-allowed}
+.btn-contexto{width:46px;height:46px;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;font-family:'Inter',sans-serif;font-size:25px;font-weight:500;line-height:1;cursor:pointer;transition:background .15s,color .15s,transform .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-contexto:hover{background:var(--accent-light)}
+.btn-contexto.active{background:var(--accent);color:#fff}
+.context-hint{display:none;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#1B7A3E;font-weight:600}
+.context-hint.visible{display:flex}
+.context-hint-dot{width:7px;height:7px;border-radius:50%;background:#1B7A3E}
+
+/* CONTEXTO ADICIONAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(20,22,28,.44);z-index:1000;align-items:center;justify-content:center;padding:18px}
+.modal-backdrop.open{display:flex}
+.context-modal{width:min(560px,100%);background:#fff;border-radius:12px;box-shadow:0 18px 56px rgba(0,0,0,.22);overflow:hidden}
+.context-modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px}
+.context-modal-title{font-size:16px;font-weight:700;color:var(--text)}
+.context-modal-close{width:32px;height:32px;border:none;background:transparent;border-radius:6px;color:var(--gray-text);font-size:23px;cursor:pointer;line-height:1}
+.context-modal-close:hover{background:var(--gray-bg)}
+.context-modal-body{padding:0 20px 18px}
+.context-modal-help{font-size:12.5px;line-height:1.55;color:var(--gray-text);margin-bottom:12px}
+.context-modal textarea{display:block;width:100%;min-height:145px;resize:vertical;border:1.5px solid var(--gray-border);border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--text);outline:none}
+.context-modal textarea:focus{border-color:var(--accent)}
+.context-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--gray-text)}
+.context-example{font-style:italic}
+.context-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.btn-context-clear,.btn-context-apply{height:38px;border-radius:7px;padding:0 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.btn-context-clear{background:#fff;border:1.5px solid var(--gray-border);color:var(--gray-text)}
+.btn-context-clear:hover{background:var(--gray-bg)}
+.btn-context-apply{background:var(--accent);border:1.5px solid var(--accent);color:#fff}
+.btn-context-apply:hover{opacity:.87}
+
+/* STATUS */
+.status-bar{max-width:880px;margin:10px auto 0;padding:0 18px;font-size:13px;color:var(--gray-text);display:flex;align-items:center;gap:8px;min-height:22px}
+.spinner{width:13px;height:13px;border:2px solid #ddd;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:#C0392B}
+
+
+</style>
+<style>
+/* css/documento.css */
+/* DOC */
+.doc-wrap{max-width:860px;margin:20px auto 60px;padding:0 18px}
+.doc{background:#fff;border:1px solid var(--gray-border);border-radius:4px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.doc-header{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:3px solid var(--accent);transition:border-color .3s}
+.doc-logo-container{width:146px;height:60px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.doc-logo-fallback{height:44px;min-width:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;text-align:center;line-height:1.2;flex-shrink:0;padding:0 10px;letter-spacing:.5px}
+.doc-main-title{font-size:16px;font-weight:700;letter-spacing:.5px;color:var(--text)}
+.doc-empresa-name{font-size:12px;color:var(--gray-text);margin-top:2px}
+.sec-head{color:#fff;font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;padding:6px 18px;transition:background .3s}
+.row-lbl{display:grid;grid-template-columns:210px 1fr;border-bottom:1px solid var(--gray-border)}
+.row-lbl:last-child{border-bottom:none}
+.cell-l{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--text);border-right:1px solid var(--gray-border);background:var(--row-stripe);display:flex;align-items:flex-start}
+.cell-v{padding:10px 16px;font-size:13px;color:var(--text);line-height:1.65}
+.block-val{padding:12px 18px;font-size:13px;line-height:1.75;color:var(--text);border-bottom:1px solid var(--gray-border)}
+.resp-list{padding:12px 18px 14px 36px;font-size:13px;line-height:1.8;color:var(--text);border-bottom:1px solid var(--gray-border);list-style:disc}
+.resp-list li{margin-bottom:3px}
+.doc-footer{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--gray-border);background:var(--row-stripe);font-size:11px;color:var(--gray-text)}
+.doc-footer>div{padding:10px 16px}
+.doc-footer>div+div{border-left:1px solid var(--gray-border)}
+.doc-footer-brand{display:flex;align-items:center;justify-content:flex-end;gap:10px;text-align:right}
+.doc-footer-brand-copy{line-height:1.45;white-space:nowrap}
+.placeholder{text-align:center;padding:60px 20px;color:#BBB;font-size:13px;line-height:1.8}
+.btn-print{display:flex;align-items:center;gap:8px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);border-radius:7px;padding:9px 22px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-print:hover{background:var(--accent-light)}
+.btn-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.btn-secondary{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--gray-border);color:var(--text);border-radius:7px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+.btn-secondary:hover{background:var(--gray-bg);border-color:#C9C5BF}
+.btn-primary-action{display:flex;align-items:center;gap:7px;background:var(--accent);border:1.5px solid var(--accent);color:#fff;border-radius:7px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-primary-action:hover{opacity:.88}
+.btn-danger{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #D76565;color:#B52A2A;border-radius:7px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-danger:hover{background:#FFF4F4}
+.edit-input,.edit-textarea{width:100%;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;padding:8px 10px;outline:none;transition:border-color .15s,box-shadow .15s}
+.edit-input:focus,.edit-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.edit-textarea{resize:vertical;min-height:76px}
+.edit-textarea--large{min-height:120px}
+.resp-edit-list{padding:12px 18px;border-bottom:1px solid var(--gray-border);display:flex;flex-direction:column;gap:8px}
+.resp-edit-item{display:grid;grid-template-columns:24px 1fr 34px;gap:8px;align-items:start}
+.resp-edit-num{font-size:12px;font-weight:700;color:var(--gray-text);padding-top:10px;text-align:center}
+.btn-remove-resp{width:34px;height:34px;border:1px solid #E5B7B7;background:#fff;color:#B52A2A;border-radius:7px;font-size:18px;line-height:1;cursor:pointer}
+.btn-remove-resp:hover{background:#FFF1F1}
+.btn-add-resp{align-self:flex-start;border:1.5px dashed var(--accent);background:#fff;color:var(--accent);border-radius:7px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.btn-add-resp:hover{background:var(--accent-light)}
+.saved-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 9px;background:#EDF8F1;color:#1B7A3E;font-size:10.5px;font-weight:700;margin-left:6px}
+.edit-note{max-width:860px;margin:8px auto 0;padding:0 18px;font-size:11.5px;color:var(--gray-text);text-align:center}
+
+
+
+</style>
+<style>
+/* css/biblioteca.css */
+/* BIBLIOTECA DE DESCRIÇÕES */
+.btn-library{height:34px;padding:0 13px;background:#fff;color:var(--text);border:1.5px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:border-color .15s,background .15s}
+.btn-library:hover{border-color:var(--accent);background:var(--accent-light)}
+.library-count{min-width:19px;height:19px;border-radius:10px;padding:0 6px;background:var(--accent);color:#fff;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.library-backdrop{display:none;position:fixed;inset:0;background:rgba(20,22,28,.52);z-index:1600;padding:24px;align-items:center;justify-content:center}
+.library-backdrop.open{display:flex}
+.library-modal{width:min(1220px,100%);height:min(820px,94vh);background:#fff;border-radius:16px;box-shadow:0 26px 76px rgba(0,0,0,.30);display:flex;flex-direction:column;overflow:hidden}
+.library-header{padding:19px 22px 15px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;gap:12px;background:#fff}
+.library-title-wrap{min-width:0}
+.library-title{font-size:18px;font-weight:800;color:var(--text)}
+.library-subtitle{font-size:11.5px;color:var(--gray-text);margin-top:3px}
+.library-header-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.library-close{width:36px;height:36px;border:none;background:transparent;border-radius:8px;font-size:25px;color:var(--gray-text);cursor:pointer;line-height:1}
+.library-close:hover{background:var(--gray-bg)}
+.library-new-folder{height:37px;padding:0 14px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.library-new-folder:hover{opacity:.88}
+
+.library-toolbar{padding:12px 22px;display:grid;grid-template-columns:minmax(260px,1fr) 220px;gap:10px;border-bottom:1px solid var(--gray-border);background:#FAFAF8}
+.library-search,.library-view-select,.folder-field-input,.folder-field-select{width:100%;height:40px;border:1.5px solid var(--gray-border);border-radius:8px;background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:12.5px;padding:0 12px;outline:none}
+.library-search:focus,.library-view-select:focus,.folder-field-input:focus,.folder-field-select:focus{border-color:var(--accent)}
+
+.library-bulkbar{min-height:52px;padding:8px 22px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--gray-border);background:#fff}
+.library-select-all{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;white-space:nowrap}
+.library-select-all input,.library-row-select input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.library-selection-count{font-size:11px;color:var(--gray-text);padding-left:2px;white-space:nowrap}
+.library-bulk-status{font-size:11px;color:var(--gray-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.library-bulk-actions{margin-left:auto;display:flex;align-items:center;gap:7px}
+.library-bulk-btn{height:34px;padding:0 12px;border-radius:7px;border:1.5px solid var(--gray-border);background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s}
+.library-bulk-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light)}
+.library-bulk-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.library-bulk-btn.primary:hover:not(:disabled){opacity:.88}
+.library-bulk-btn:disabled{opacity:.42;cursor:not-allowed}
+
+.library-body{padding:16px 22px 24px;overflow:auto;flex:1;background:#F7F7F5}
+.library-summary{font-size:11.5px;color:var(--gray-text);margin:0 0 10px 2px}
+.library-group{margin-bottom:20px}
+.library-group-title{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;color:var(--text);margin:0 0 8px 2px}
+.library-group-count{font-size:10px;color:var(--gray-text);background:#fff;border:1px solid var(--gray-border);border-radius:999px;padding:2px 7px}
+.library-folder-info{font-size:10.5px;color:var(--gray-text);font-weight:500;text-transform:none;letter-spacing:0;margin-left:4px}
+.library-list{display:flex;flex-direction:column;gap:7px}
+
+.library-row{display:grid;grid-template-columns:34px minmax(260px,1fr) 150px 150px auto;align-items:center;gap:12px;background:#fff;border:1px solid #E6E3DE;border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.025);transition:border-color .15s,box-shadow .15s,transform .15s;min-width:0}
+.library-row:hover{border-color:#D2CEC7;box-shadow:0 3px 12px rgba(0,0,0,.055);transform:translateY(-1px)}
+.library-row.selected{border-color:color-mix(in srgb,var(--accent) 40%,#E6E3DE);background:color-mix(in srgb,var(--accent-light) 38%,#fff)}
+.library-row-select{display:flex;align-items:center;justify-content:center}
+.library-row-main{min-width:0}
+.library-row-titleline{display:flex;align-items:center;gap:8px;min-width:0}
+.library-company-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.library-row-cargo{font-size:13.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.library-row-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:4px;font-size:10.8px;color:var(--gray-text);line-height:1.4}
+.library-row-company{font-weight:700;color:#4C4945}
+.library-meta-sep{color:#C1BDB7}
+.library-date-col{min-width:0}
+.library-date-label{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.45px;color:#9A9690;font-weight:700;margin-bottom:3px}
+.library-date-value{display:block;font-size:10.8px;color:var(--text);font-weight:600;white-space:nowrap}
+.library-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.library-row-actions button{height:30px;padding:0 9px;border-radius:6px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--gray-border);color:var(--text);white-space:nowrap}
+.library-row-actions button:hover{background:var(--gray-bg)}
+.library-row-actions .open{background:var(--accent);border-color:var(--accent);color:#fff}
+.library-row-actions .open:hover{opacity:.88;background:var(--accent)}
+.library-row-actions .delete{color:#B52A2A;border-color:#E7C5C5}
+.library-row-actions .delete:hover{background:#FFF4F4}
+.library-empty{background:#fff;border:1px dashed var(--gray-border);border-radius:10px;padding:44px 20px;text-align:center;color:var(--gray-text);font-size:12.5px;line-height:1.6}
+
+@media(max-width:1050px){
+  .api-key-input{width:190px}
+  .topbar{padding-left:16px;padding-right:16px}
+  .library-row{grid-template-columns:34px minmax(220px,1fr) 130px 130px}
+  .library-row-actions{grid-column:2/-1;justify-content:flex-start;padding-top:2px}
+}
+@media(max-width:760px){
+  .topbar{flex-wrap:wrap}
+  .topbar-right{width:100%;margin-left:0;flex-wrap:wrap}
+  .api-key-input{flex:1;min-width:180px}
+  .library-backdrop{padding:8px}
+  .library-modal{height:96vh;border-radius:12px}
+  .library-toolbar{grid-template-columns:1fr;padding:10px 12px}
+  .library-header{padding:14px 12px}
+  .library-body{padding:12px}
+  .library-header-actions{gap:5px}
+  .library-new-folder{padding:0 10px}
+  .library-bulkbar{padding:9px 12px;align-items:flex-start;flex-wrap:wrap;gap:8px}
+  .library-bulk-actions{width:100%;margin-left:0}
+  .library-bulk-btn{flex:1}
+  .library-bulk-status{order:3;width:100%}
+  .library-row{grid-template-columns:30px minmax(0,1fr);gap:8px;padding:11px}
+  .library-date-col{grid-column:2;display:flex;align-items:center;gap:6px}
+  .library-date-label{display:inline;margin:0}
+  .library-date-value{display:inline}
+  .library-row-actions{grid-column:2;justify-content:flex-start;flex-wrap:wrap}
+}
+
+.folder-backdrop{display:none;position:fixed;inset:0;background:rgba(20,22,28,.56);z-index:1750;padding:18px;align-items:center;justify-content:center}
+.folder-backdrop.open{display:flex}
+.folder-modal{width:min(500px,100%);background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.folder-modal-header{padding:17px 19px 12px;display:flex;align-items:center;justify-content:space-between}
+.folder-modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.folder-modal-body{padding:0 19px 19px}
+.folder-field{margin-top:12px}
+.folder-label{display:block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.55px;color:var(--gray-text);margin-bottom:6px}
+.folder-help{font-size:11.5px;color:var(--gray-text);line-height:1.5;margin-top:6px}
+.folder-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.folder-actions button{height:37px;padding:0 15px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.folder-cancel{background:#fff;border:1.5px solid var(--gray-border);color:var(--text)}
+.folder-save{background:var(--accent);border:1.5px solid var(--accent);color:#fff}
+.folder-checks{max-height:260px;overflow:auto;border:1px solid var(--gray-border);border-radius:8px;margin-top:8px}
+.folder-check-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border-bottom:1px solid #EEECE8;font-size:12px;color:var(--text)}
+.folder-check-row:last-child{border-bottom:none}
+.folder-check-row input{accent-color:var(--accent)}
+
+@media(max-width:980px){.api-key-input{width:190px}.topbar{padding-left:16px;padding-right:16px}.library-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar-right{width:100%;margin-left:0;flex-wrap:wrap}.api-key-input{flex:1;min-width:180px}.library-backdrop{padding:8px}.library-modal{height:96vh}.library-toolbar{grid-template-columns:1fr}.library-header{padding:14px}.library-body{padding:14px}.library-header-actions{gap:5px}.library-new-folder{padding:0 10px}}
+
+
+</style>
+<style>
+/* css/analises-impressao.css */
+/* RODAPÉ INSTITUCIONAL DA PÁGINA — não integra o documento exportado em PDF */
+.app-footer{max-width:880px;margin:0 auto 16px;padding:8px 18px 0;text-align:right;color:#999692;font-size:9px;line-height:1.45}
+.app-footer strong{font-weight:600;color:#817D78;font-size:9px}
+.app-footer-note{display:block;margin-top:1px;max-width:460px;margin-left:auto}
+
+/* EXPORTAÇÃO DIRETA PARA PDF EM A4 */
+.pdf-export-host{position:fixed;left:-10000px;top:0;width:186mm;background:#fff;z-index:-1;pointer-events:none}
+.pdf-export-host .doc{width:186mm;max-width:186mm;border:1px solid #E0DDD8;box-shadow:none;border-radius:4px;background:#fff}
+.pdf-export-host *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+.pdf-export-host .cell-l{background:#FAFAF8!important}
+.pdf-export-host .doc-footer{background:#FAFAF8!important}
+.pdf-export-host .brand-slot{background:#fff!important;overflow:hidden!important}
+.pdf-export-host .brand-logo{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
+
+.batch-pdf-host{position:absolute;left:0;top:0;width:186mm;background:#fff;z-index:-1;pointer-events:none}
+.batch-pdf-host .batch-page{width:186mm;background:#fff;break-after:page;page-break-after:always}
+.batch-pdf-host .batch-page:last-child{break-after:auto;page-break-after:auto}
+.batch-pdf-host .doc{width:186mm;max-width:186mm;border:1px solid #E0DDD8;box-shadow:none;border-radius:4px;background:#fff}
+.batch-pdf-host *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+.batch-pdf-host .cell-l{background:#FAFAF8!important}
+.batch-pdf-host .doc-footer{background:#FAFAF8!important}
+
+
+/* PAINEL DE GRADING — fora do documento, não aparece na impressão */
+.grading-panel{max-width:860px;margin:12px auto 60px;padding:0 18px}
+.grading-panel.is-hidden{display:none}
+.grading-toggle-wrap{max-width:860px;margin:14px auto 0;padding:0 18px;display:flex;justify-content:flex-end}
+.btn-grading-toggle{height:38px;padding:0 14px;border:1.5px solid var(--gray-border);background:#fff;color:var(--text);border-radius:8px;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn-grading-toggle:hover{border-color:var(--accent);background:var(--accent-light)}
+.grading-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.analysis-toolbar{max-width:860px;margin:18px auto 0;padding:0 18px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-analysis-toggle{height:42px;min-width:230px;padding:0 16px;border:1.5px solid var(--gray-border);background:#fff;color:var(--text);border-radius:12px;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:.15s}
+.btn-analysis-toggle:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px)}
+.btn-analysis-toggle.is-open{background:var(--accent-light);border-color:var(--accent)}
+.complexity-panel-wrap{max-width:860px;margin:12px auto 0;padding:0 18px}
+.complexity-panel-wrap.is-hidden{display:none}
+.complexity-panel-wrap .complexity-section{grid-column:auto}
+
+/* PESQUISA SALARIAL */
+.salary-panel{max-width:860px;margin:12px auto 0;padding:0 18px}
+.salary-panel.is-hidden{display:none}
+.salary-card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.035)}
+.salary-head{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border-bottom:1px solid var(--gray-border)}
+.salary-title-wrap{min-width:0}
+.salary-title{font-size:13.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+.salary-subtitle{font-size:10.5px;line-height:1.5;color:var(--gray-text);margin-top:4px;max-width:620px}
+.salary-badge{margin-left:auto;flex-shrink:0;border:1px solid var(--gray-border);background:#FAFAF8;border-radius:999px;padding:5px 9px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-text)}
+.salary-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:11px 18px;background:#FAFAF8;border-bottom:1px solid var(--gray-border)}
+.salary-btn{height:34px;padding:0 11px;border:1.5px solid var(--gray-border);background:#fff;color:var(--text);border-radius:7px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:800;cursor:pointer}
+.salary-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light)}
+.salary-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.salary-btn.primary:hover:not(:disabled){opacity:.88;background:var(--accent)}
+.salary-btn:disabled{opacity:.45;cursor:not-allowed}
+.salary-stale{margin:10px 18px 0;padding:8px 10px;border-radius:7px;background:#FFF7E6;border:1px solid #F0D49A;color:#7A5A13;font-size:10.5px;line-height:1.45}
+.salary-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 18px 0}
+.salary-stat{background:#FAFAF8;border:1px solid var(--gray-border);border-radius:8px;padding:10px 11px;min-width:0}
+.salary-stat-label{font-size:8.5px;text-transform:uppercase;letter-spacing:.45px;font-weight:800;color:var(--gray-text);display:block;margin-bottom:4px}
+.salary-stat-value{font-size:15px;font-weight:800;color:var(--text);line-height:1.25}
+.salary-stat-note{font-size:9px;color:var(--gray-text);margin-top:3px;line-height:1.35}
+.salary-content{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(230px,.65fr);gap:12px;padding:14px 18px 18px}
+.salary-map-wrap{border:1px solid var(--gray-border);border-radius:9px;background:#FAFAF8;min-height:360px;overflow:hidden;position:relative}
+.salary-map{width:100%;height:360px}
+.salary-map-loading{height:360px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--gray-text);font-size:11px;line-height:1.5}
+.salary-state-side{display:flex;flex-direction:column;gap:9px}
+.salary-state-select{width:100%;height:38px;border:1.5px solid var(--gray-border);border-radius:8px;padding:0 10px;background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:11.5px;outline:none}
+.salary-state-select:focus{border-color:var(--accent)}
+.salary-state-detail{border:1px solid var(--gray-border);border-radius:9px;padding:13px;background:#fff}
+.salary-state-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px}
+.salary-state-range{font-size:13.5px;font-weight:800;margin-top:2px;line-height:1.45}
+.salary-state-range .salary-range-label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.35px;color:var(--gray-text);margin-bottom:4px}
+.salary-state-range .salary-range-value{display:block}
+.salary-state-index{margin-top:11px;padding-top:10px;border-top:1px solid var(--gray-border);font-size:10px;color:var(--gray-text);line-height:1.5}
+.salary-source{padding:0 18px 15px;font-size:9.5px;line-height:1.5;color:var(--gray-text)}
+.salary-source strong{color:var(--text)}
+.salary-empty{padding:24px 18px;text-align:center;color:var(--gray-text);font-size:11px;line-height:1.6}
+@media(max-width:760px){
+  .analysis-toolbar{gap:8px}
+  .btn-analysis-toggle{width:100%;min-width:0}
+  .salary-summary{grid-template-columns:1fr}
+  .salary-content{grid-template-columns:1fr}
+  .salary-map,.salary-map-loading{height:330px}
+  .salary-map-wrap{min-height:330px}
+}
+
+.grading-icon{font-size:16px}
+.grading-subtitle{font-size:11px;font-weight:400;color:var(--gray-text);margin-left:4px}
+.grading-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:640px){.grading-grid{grid-template-columns:1fr}}
+.grading-section{background:#fff;border:1px solid var(--gray-border);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.025)}
+.grading-section-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.grading-method-badge{font-size:8.5px;letter-spacing:.35px;text-transform:uppercase;border:1px solid var(--gray-border);border-radius:999px;padding:3px 7px;background:#FAFAF8;color:var(--gray-text);white-space:nowrap}
+.grading-section .gi-destaque{display:inline-flex;align-items:center;min-height:25px;padding:3px 8px;border-radius:6px;background:var(--accent-light)}
+
+.grading-fields{display:flex;flex-direction:column;gap:0}
+.grading-row-info{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-border)}
+.grading-row-info:last-child{border-bottom:none}
+.grading-row-just{align-items:flex-start}
+.gi-label{font-size:10.5px;font-weight:700;color:var(--gray-text);min-width:88px;padding-top:1px;flex-shrink:0}
+.gi-value{font-size:13px;color:var(--text);line-height:1.5}
+.gi-destaque{font-weight:700;font-size:14px}
+.gi-just{font-size:12px;color:var(--gray-text);line-height:1.55;font-style:italic}
+
+.complexity-section{grid-column:1/-1;background:#fff;border:1px solid var(--gray-border);border-radius:8px;padding:16px 18px}
+.complexity-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.complexity-title-wrap{min-width:0}
+.complexity-name{font-size:12px;font-weight:800;color:var(--text);letter-spacing:.3px}
+.complexity-help{font-size:10.5px;color:var(--gray-text);line-height:1.45;margin-top:3px}
+.complexity-badge{flex-shrink:0;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;border:1px solid var(--gray-border);background:var(--gray-bg);color:var(--text)}
+.complexity-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:10px 0 6px}
+.complexity-step{height:8px;border-radius:999px;background:#E7E4DF}
+.complexity-step.active{background:var(--accent)}
+.complexity-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:13px}
+.complexity-legend-item{text-align:center;font-size:8.5px;color:var(--gray-text);line-height:1.25}
+.complexity-legend-item strong{display:block;font-size:9.5px;color:var(--text);margin-bottom:1px}
+.complexity-factors{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:10px 0}
+.complexity-factor{border:1px solid var(--gray-border);border-radius:7px;padding:8px 9px;background:#FAFAF8;min-width:0}
+.complexity-factor-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:var(--gray-text);display:block;margin-bottom:3px}
+.complexity-factor-value{font-size:11px;font-weight:700;color:var(--text);line-height:1.35}
+.complexity-factor-score{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:21px;border-radius:999px;padding:0 7px;margin-bottom:5px;font-size:9.5px;font-weight:800;background:var(--accent-light);color:var(--accent);border:1px solid var(--gray-border)}
+.complexity-index{font-size:10px;color:var(--gray-text);margin-top:5px}
+.complexity-just{font-size:11.5px;color:var(--gray-text);line-height:1.55;margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-border)}
+.complexity-actions{display:flex;justify-content:flex-end;margin-top:11px}
+.btn-recalculate{height:32px;padding:0 11px;border:1.5px solid var(--gray-border);background:#fff;color:var(--text);border-radius:7px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer}
+.btn-recalculate:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light)}
+.btn-recalculate:disabled{opacity:.45;cursor:not-allowed}
+.grading-method-note{font-size:10px;color:var(--gray-text);line-height:1.45;margin:-4px 0 10px;padding:7px 9px;background:#FAFAF8;border-radius:6px;border:1px solid var(--gray-border)}
+@media(max-width:700px){
+  .complexity-factors{grid-template-columns:1fr 1fr}
+  .complexity-factor:last-child{grid-column:1/-1}
+  .complexity-legend{grid-template-columns:repeat(5,minmax(48px,1fr));overflow-x:auto;padding-bottom:3px}
+}
+@media(max-width:440px){
+  .complexity-factors{grid-template-columns:1fr}
+  .complexity-factor:last-child{grid-column:auto}
+}
+
+@media print{.grading-panel,.analysis-toolbar,.complexity-panel-wrap,.salary-panel{display:none!important}}
+
+@page{size:A4 portrait;margin:12mm}
+
+@media print{
+  .topbar,.empresa-bar,.search-wrap,.status-bar,.btn-row,.app-footer,.saved-badge,.edit-note,.library-backdrop,.folder-backdrop{display:none!important}
+  .doc-wrap{padding:0;margin:0;max-width:100%}
+  body{background:#fff}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .doc{border:1px solid #E0DDD8!important;box-shadow:none!important}
+  .doc-header{border-bottom-width:3px!important;border-bottom-style:solid!important}
+  .sec-head{color:#fff!important}
+  .cell-l{background:#FAFAF8!important}
+  .doc-footer{background:#FAFAF8!important}
+  .doc{page-break-inside:avoid}
+  .row-lbl{page-break-inside:avoid}
+  .brand-slot{background:#fff!important;overflow:hidden!important}
+  .brand-logo{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
+  img{max-width:100%!important}
+}
+
+</style>
+<style>
+/* css/portfolio.css */
+/* Identidade independente da edição pública. */
+:root{--accent:#16805D;--accent-light:#E7F4EC;--gray-bg:#F5F9F6}
+.topbar{padding:18px 28px;flex-wrap:wrap}.topbar-info .title{color:var(--accent)}
+.portfolio-intro{max-width:880px;margin:40px auto 28px;padding:0 18px}
+.portfolio-eyebrow{font-size:10px;letter-spacing:1.8px;font-weight:700;color:var(--accent)}
+.portfolio-intro h1{font-size:38px;letter-spacing:-1.4px;line-height:1.2;margin:12px 0;color:#173D2D}
+.portfolio-intro p{font-size:14px;line-height:1.7;color:#5E7268;max-width:620px}
+.portfolio-demo-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px}
+.portfolio-demo-row span{font-size:11px;color:#708878}
+.portfolio-demo-row button{color:var(--accent);border-color:#B8D9C5;background:#fff}
+.doc-header{padding:20px 22px}.doc-empresa-name{margin-top:6px}
+@media(max-width:700px){.topbar{padding:16px}.topbar-right{margin-left:0;flex-wrap:wrap;width:100%}.api-key-input{flex:1;min-width:140px;width:180px}.portfolio-intro{margin-top:28px}.portfolio-intro h1{font-size:30px}.search-row{flex-wrap:wrap}.search-row input{min-width:180px}}
+@media print{.portfolio-intro{display:none!important}}
+
+</style>
+</head>
+<body>
+<a href="index.html" style="display:block;padding:12px 28px;color:#16805d;font:600 14px system-ui">← Voltar à apresentação do projeto</a>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  
+  <div class="topbar-info">
+    <div class="title" id="topbar-title">Descrição de Cargos</div>
+    <div class="sub">Criação, análise e biblioteca de cargos</div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-library" type="button" onclick="abrirBiblioteca()" title="Abrir biblioteca de descrições">📚 Biblioteca <span class="library-count" id="library-count">0</span></button>
+    <input class="api-key-input" type="password" id="api-key-field" placeholder="Sua chave Groq (somente nesta sessão)" />
+    <button class="btn-save-key" onclick="salvarChave()">Usar chave</button>
+    <span class="key-status none" id="key-status">⚠ Sem chave</span>
+  </div>
+</div>
+
+<section class="portfolio-intro">
+  <span class="portfolio-eyebrow">PROJETO DE PORTFÓLIO · MARCOS DAVI</span>
+  <h1>Clareza para cada cargo.</h1>
+  <p>Crie descrições, organize responsabilidades e explore análises de cargos em um só lugar.</p>
+  <div class="portfolio-demo-row"><button class="btn-secondary" type="button" onclick="carregarExemploPortfolio()">Explorar exemplo fictício</button><span>Sem cadastro e sem chave de IA para experimentar.</span></div>
+</section>
+<!-- BUSCA -->
+<div class="search-wrap" style="margin-top:20px">
+  <span class="section-label">Nome do Cargo</span>
+  <div class="search-row">
+    <input type="text" id="cargo-input" placeholder="Ex: Analista de Infraestrutura Pleno, Gerente de Projetos..." />
+    <button class="btn-contexto" id="btn-contexto" onclick="abrirContexto()" title="Adicionar contexto à descrição" aria-label="Adicionar contexto à descrição">+</button>
+    <button class="btn-gerar" id="btn-gerar" onclick="gerar()">Gerar Descrição</button>
+  </div>
+  <div class="context-hint" id="context-hint"><span class="context-hint-dot"></span> Contexto adicional será considerado nesta descrição</div>
+</div>
+
+<div class="modal-backdrop" id="context-modal" onclick="fecharContextoPorFundo(event)">
+  <div class="context-modal" role="dialog" aria-modal="true" aria-labelledby="context-modal-title">
+    <div class="context-modal-header">
+      <div class="context-modal-title" id="context-modal-title">Adicionar contexto</div>
+      <button type="button" class="context-modal-close" onclick="fecharContexto()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="context-modal-body">
+      <p class="context-modal-help">Inclua orientações específicas da vaga. Informe a área, o nível de experiência ou o contexto de atuação.</p>
+      <textarea id="contexto-input" maxlength="2000" oninput="atualizarContadorContexto()" placeholder="Ex: atuação voltada para folha de pagamento; foco em indicadores; atendimento às filiais; experiência com SAP desejável..."></textarea>
+      <div class="context-meta"><span class="context-example">Opcional — será enviado à IA nesta sessão.</span><span><span id="context-count">0</span>/2000</span></div>
+      <div class="context-modal-actions">
+        <button type="button" class="btn-context-clear" onclick="limparContexto()">Limpar</button>
+        <button type="button" class="btn-context-apply" onclick="salvarContexto()">Aplicar contexto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BIBLIOTECA -->
+<div class="library-backdrop" id="library-modal" onclick="fecharBibliotecaPorFundo(event)">
+  <div class="library-modal" role="dialog" aria-modal="true" aria-labelledby="library-title">
+    <div class="library-header">
+      <div class="library-title-wrap">
+        <div class="library-title" id="library-title">Biblioteca de Descrições</div>
+        <div class="library-subtitle">Consulte cargos validados, datas e organize por área ou pastas próprias.</div>
+      </div>
+      <div class="library-header-actions">
+        <button class="library-new-folder" type="button" onclick="abrirCriarPasta()">＋ Nova pasta</button>
+        <button class="library-close" type="button" onclick="fecharBiblioteca()" aria-label="Fechar">&times;</button>
+      </div>
+    </div>
+    <div class="library-toolbar">
+      <input class="library-search" id="library-search" type="search" placeholder="Buscar cargo, área ou departamento..." oninput="renderBiblioteca()">
+      <select class="library-view-select" id="library-view" onchange="renderBiblioteca()">
+        <option value="todos">Todos os cargos</option>
+        <option value="segmento">Organizar por segmento / área</option>
+        <option value="pastas">Minhas pastas</option>
+      </select>
+    </div>
+    <div class="library-bulkbar">
+      <label class="library-select-all">
+        <input id="library-select-all" type="checkbox" onchange="selecionarTodosVisiveis(this.checked)">
+        Selecionar visíveis
+      </label>
+      <span class="library-selection-count" id="library-selection-count">0 selecionados</span>
+      <span class="library-bulk-status" id="library-bulk-status"></span>
+      <div class="library-bulk-actions">
+        <button class="library-bulk-btn" id="library-print-selected" type="button" onclick="imprimirSelecionados()" disabled>🖨️ Imprimir selecionados</button>
+        <button class="library-bulk-btn primary" id="library-pdf-selected" type="button" onclick="baixarPDFSelecionados()" disabled>⬇ Baixar PDFs</button>
+      </div>
+    </div>
+    <div class="library-body" id="library-body"></div>
+  </div>
+</div>
+
+<!-- CRIAR PASTA -->
+<div class="folder-backdrop" id="folder-modal" onclick="fecharPastaPorFundo(event)">
+  <div class="folder-modal" role="dialog" aria-modal="true" aria-labelledby="folder-title">
+    <div class="folder-modal-header">
+      <div class="folder-modal-title" id="folder-title">Nova pasta</div>
+      <button class="library-close" type="button" onclick="fecharCriarPasta()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="folder-modal-body">
+      <div class="folder-field">
+        <label class="folder-label" for="folder-name">Nome da pasta</label>
+        <input class="folder-field-input" id="folder-name" maxlength="60" placeholder="Ex: Administrativo, Operacional, Corporativo...">
+      </div>
+      <div class="folder-field">
+        <label class="folder-label" for="folder-type">Tipo</label>
+        <select class="folder-field-select" id="folder-type" onchange="atualizarCamposPasta()">
+          <option value="personalizada">Personalizada</option>
+          <option value="segmento">Segmento / área</option>
+        </select>
+        <div class="folder-help" id="folder-type-help"></div>
+      </div>
+      <div class="folder-field" id="folder-criteria-wrap"></div>
+      <div class="folder-actions">
+        <button class="folder-cancel" type="button" onclick="fecharCriarPasta()">Cancelar</button>
+        <button class="folder-save" type="button" onclick="salvarNovaPasta()">Criar pasta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORGANIZAR CARGO -->
+<div class="folder-backdrop" id="organize-modal" onclick="fecharOrganizarPorFundo(event)">
+  <div class="folder-modal" role="dialog" aria-modal="true" aria-labelledby="organize-title">
+    <div class="folder-modal-header">
+      <div class="folder-modal-title" id="organize-title">Organizar em pastas</div>
+      <button class="library-close" type="button" onclick="fecharOrganizar()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="folder-modal-body">
+      <div class="folder-help">Pastas de área são inteligentes. Aqui você escolhe apenas as pastas personalizadas.</div>
+      <div class="folder-checks" id="organize-checks"></div>
+      <div class="folder-actions">
+        <button class="folder-cancel" type="button" onclick="fecharOrganizar()">Cancelar</button>
+        <button class="folder-save" type="button" onclick="salvarOrganizacao()">Salvar organização</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar" id="status-bar"></div>
+
+<div class="doc-wrap" id="doc-wrap"></div>
+
+<footer class="app-footer" aria-label="Informações institucionais">
+  <strong>Desenvolvido por Marcos Davi.</strong>
+  <span class="app-footer-note">As informações apresentadas são geradas com o auxílio de Inteligência Artificial e devem ser analisadas e validadas antes de sua utilização em processos oficiais.</span>
+</footer>
+
+<script>
+/* js/dados/empresas.js */
+// Perfil neutro usado apenas para compatibilidade com o modelo de dados.
+const EMPRESAS = [{ id:'portfolio', nome:'Descrição de Cargos', cor:'#16805D', descricao:'Contexto profissional genérico, sem vínculo com organização específica.' }];
+
+</script>
+<script>
+/* js/estado.js */
+let empresaAtual = EMPRESAS[0];
+let contextoAdicional = '';
+let descricaoAtual = null;
+let cargoConsultaAtual = '';
+let modoEdicao = false;
+let descricaoAntesDaEdicao = null;
+const STORAGE_DESCRICOES = 'portfolio_cargos_salvos_v1';
+const STORAGE_PASTAS = 'portfolio_cargos_pastas_v1';
+let registroOrganizacaoAtual = '';
+const selecionadosBiblioteca = new Set();
+
+</script>
+<script>
+/* js/contexto.js */
+function abrirContexto() {
+  const modal = document.getElementById('context-modal');
+  const campo = document.getElementById('contexto-input');
+  campo.value = contextoAdicional;
+  atualizarContadorContexto();
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => campo.focus(), 0);
+}
+
+function fecharContexto() {
+  document.getElementById('context-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function fecharContextoPorFundo(event) {
+  if (event.target.id === 'context-modal') fecharContexto();
+}
+
+function atualizarContadorContexto() {
+  const campo = document.getElementById('contexto-input');
+  document.getElementById('context-count').textContent = campo.value.length;
+}
+
+function atualizarSinalContexto() {
+  const ativo = Boolean(contextoAdicional);
+  document.getElementById('btn-contexto').classList.toggle('active', ativo);
+  document.getElementById('context-hint').classList.toggle('visible', ativo);
+  document.getElementById('btn-contexto').title = ativo ? 'Editar contexto adicional' : 'Adicionar contexto à descrição';
+}
+
+function salvarContexto() {
+  contextoAdicional = document.getElementById('contexto-input').value.trim();
+  atualizarSinalContexto();
+  fecharContexto();
+  setStatus(contextoAdicional
+    ? '✓ Contexto adicional incluído. Ele será considerado na próxima geração.'
+    : 'Contexto adicional removido.');
+}
+
+function limparContexto() {
+  document.getElementById('contexto-input').value = '';
+  contextoAdicional = '';
+  atualizarContadorContexto();
+  atualizarSinalContexto();
+  fecharContexto();
+  setStatus('Contexto adicional removido.');
+}
+
+
+</script>
+<script>
+/* js/marcas.js */
+// Não há marcas ou logotipos na versão de portfólio.
+function renderMarca() { return ""; }
+
+async function aguardarImagens(container) {
+  const imagens = Array.from(container.querySelectorAll('img'));
+  await Promise.all(imagens.map(img => img.complete
+    ? Promise.resolve()
+    : new Promise(resolve => {
+        img.addEventListener('load', resolve, { once:true });
+        img.addEventListener('error', resolve, { once:true });
+      })
+  ));
+}
+
+
+</script>
+<script>
+/* js/chave-api.js */
+/* ─── CHAVE API ──────────────────────────────────────────────────────── */
+function salvarChave() {
+  const val = document.getElementById('api-key-field').value.trim();
+  if (!val) { atualizarStatusChave(); return; }
+  try { sessionStorage.setItem('portfolio_groq_key', val); }
+  catch (e) {
+    setStatus('<span class="err">⚠ Não foi possível salvar a chave. Verifique o armazenamento do navegador.</span>');
+    return;
+  }
+  document.getElementById('api-key-field').value = '';
+  atualizarStatusChave();
+}
+function getChave() {
+  try { return sessionStorage.getItem('portfolio_groq_key') || ''; }
+  catch (e) { return ''; }
+}
+function atualizarStatusChave() {
+  const el = document.getElementById('key-status');
+  if (getChave()) {
+    el.textContent = '✓ Chave nesta sessão';
+    el.className = 'key-status';
+  } else {
+    el.textContent = '⚠ Sem chave';
+    el.className = 'key-status none';
+  }
+}
+
+</script>
+<script>
+/* js/empresas.js */
+// A versão pública utiliza um único perfil, sem seleção de organizações.
+function selectEmpresa(id) {
+  if (id !== 'portfolio') return;
+  empresaAtual = EMPRESAS[0];
+  document.documentElement.style.setProperty('--accent', empresaAtual.cor);
+  document.documentElement.style.setProperty('--accent-light', '#E7F4EC');
+  document.getElementById('topbar-title').textContent = 'Descrição de Cargos';
+}
+
+</script>
+<script>
+/* js/utilitarios.js */
+/* ─── HELPERS ────────────────────────────────────────────────────────── */
+function today() { return new Date().toLocaleDateString('pt-BR'); }
+function setStatus(html) { document.getElementById('status-bar').innerHTML = html; }
+function esc(s) { return s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+</script>
+<script>
+/* js/armazenamento.js */
+/* ─── MEMÓRIA LOCAL E BIBLIOTECA DE DESCRIÇÕES ──────────────────────── */
+function normalizarCargoChave(nome) {
+  return String(nome || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function chaveDescricao(empresaId, nomeCargo) {
+  return `${empresaId}::${normalizarCargoChave(nomeCargo)}`;
+}
+
+function novoId(prefixo = 'item') {
+  return `${prefixo}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function lerBibliotecaDescricoes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_DESCRICOES);
+    const dados = raw ? JSON.parse(raw) : {};
+    return dados && typeof dados === 'object' && !Array.isArray(dados) ? dados : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function gravarBibliotecaDescricoes(biblioteca) {
+  try {
+    localStorage.setItem(STORAGE_DESCRICOES, JSON.stringify(biblioteca));
+    atualizarBadgeBiblioteca();
+    return true;
+  } catch (e) {
+    setStatus('<span class="err">⚠ Não foi possível salvar no navegador. Verifique se o armazenamento local está habilitado.</span>');
+    return false;
+  }
+}
+
+function buscarRegistroSalvo(nomeCargo) {
+  const biblioteca = lerBibliotecaDescricoes();
+  return biblioteca[chaveDescricao(empresaAtual.id, nomeCargo)] || null;
+}
+
+function buscarDescricaoSalva(nomeCargo) {
+  const item = buscarRegistroSalvo(nomeCargo);
+  if (!item || !item.descricao) return null;
+  return JSON.parse(JSON.stringify(item.descricao));
+}
+
+function existeDescricaoSalva(nomeCargo) {
+  if (!nomeCargo) return false;
+  return Boolean(buscarRegistroSalvo(nomeCargo));
+}
+
+function salvarDescricaoLocal(descricao, nomeConsulta) {
+  const biblioteca = lerBibliotecaDescricoes();
+  const chaveConsulta = chaveDescricao(empresaAtual.id, nomeConsulta);
+  const chaveCargoFinal = chaveDescricao(empresaAtual.id, descricao.cargo || nomeConsulta);
+  const existente = biblioteca[chaveConsulta] || biblioteca[chaveCargoFinal] || null;
+  const agora = new Date().toISOString();
+
+  const uidExistente = existente ? identificadorRegistro(existente) : '';
+  const registro = {
+    id: existente?.id || novoId('desc'),
+    empresaId: empresaAtual.id,
+    empresaNome: empresaAtual.nome,
+    cargoConsulta: nomeConsulta,
+    cargo: descricao.cargo || nomeConsulta,
+    criadoEm: existente?.criadoEm || existente?.salvoEm || existente?.atualizadoEm || agora,
+    modificadoEm: agora,
+    atualizadoEm: agora,
+    pastaIds: Array.isArray(existente?.pastaIds) ? [...existente.pastaIds] : [],
+    descricao: JSON.parse(JSON.stringify(descricao))
+  };
+
+  // Remove aliases antigos do mesmo registro para evitar entradas órfãs após renomear o cargo.
+  Object.keys(biblioteca).forEach(chave => {
+    const item = biblioteca[chave];
+    if ((item?.id && item.id === registro.id) || (uidExistente && identificadorRegistro(item) === uidExistente)) delete biblioteca[chave];
+  });
+
+  biblioteca[chaveConsulta] = registro;
+  if (normalizarCargoChave(registro.cargo) !== normalizarCargoChave(nomeConsulta)) {
+    biblioteca[chaveCargoFinal] = registro;
+  }
+
+  return gravarBibliotecaDescricoes(biblioteca);
+}
+
+function identificadorRegistro(item) {
+  if (item?.id) return item.id;
+  return `legacy_${item?.empresaId || ''}_${normalizarCargoChave(item?.cargo || item?.cargoConsulta || '')}_${item?.atualizadoEm || item?.modificadoEm || ''}`;
+}
+
+function listarRegistrosUnicos() {
+  const biblioteca = lerBibliotecaDescricoes();
+  const unicos = new Map();
+  Object.values(biblioteca).forEach(item => {
+    if (!item || !item.descricao) return;
+    const uid = identificadorRegistro(item);
+    if (!unicos.has(uid)) {
+      const reg = JSON.parse(JSON.stringify(item));
+      reg._uid = uid;
+      reg.criadoEm = reg.criadoEm || reg.salvoEm || reg.atualizadoEm || reg.modificadoEm || new Date().toISOString();
+      reg.modificadoEm = reg.modificadoEm || reg.atualizadoEm || reg.criadoEm;
+      reg.pastaIds = Array.isArray(reg.pastaIds) ? reg.pastaIds : [];
+      unicos.set(uid, reg);
+    }
+  });
+  return Array.from(unicos.values()).sort((a,b) => new Date(b.modificadoEm || 0) - new Date(a.modificadoEm || 0));
+}
+
+function obterRegistroPorUid(uid) {
+  return listarRegistrosUnicos().find(r => r._uid === uid) || null;
+}
+
+function excluirDescricaoSalva() {
+  if (!cargoConsultaAtual) return;
+  const registro = buscarRegistroSalvo(cargoConsultaAtual) || (descricaoAtual?.cargo ? buscarRegistroSalvo(descricaoAtual.cargo) : null);
+  if (!registro) return;
+  excluirRegistroBiblioteca(identificadorRegistro(registro), false);
+  setStatus('✓ Descrição salva removida. A próxima geração poderá usar a IA novamente.');
+  renderDoc(descricaoAtual, false);
+}
+
+/* ─── PASTAS DA BIBLIOTECA ──────────────────────────────────────────── */
+function lerPastasBiblioteca() {
+  try {
+    const raw = localStorage.getItem(STORAGE_PASTAS);
+    const pastas = raw ? JSON.parse(raw) : [];
+    return Array.isArray(pastas) ? pastas : [];
+  } catch (e) { return []; }
+}
+
+function gravarPastasBiblioteca(pastas) {
+  try {
+    localStorage.setItem(STORAGE_PASTAS, JSON.stringify(pastas));
+    return true;
+  } catch (e) {
+    setStatus('<span class="err">⚠ Não foi possível salvar as pastas no navegador.</span>');
+    return false;
+  }
+}
+
+</script>
+<script>
+/* js/biblioteca.js */
+function formatarDataHora(valor) {
+  if (!valor) return '—';
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return '—';
+  return data.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function atualizarBadgeBiblioteca() {
+  const el = document.getElementById('library-count');
+  if (el) el.textContent = String(listarRegistrosUnicos().length);
+}
+
+function abrirBiblioteca() {
+  selecionadosBiblioteca.clear();
+  document.getElementById('library-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderBiblioteca();
+  setTimeout(() => document.getElementById('library-search')?.focus(), 0);
+}
+
+function fecharBiblioteca() {
+  document.getElementById('library-modal').classList.remove('open');
+  if (!document.querySelector('.folder-backdrop.open')) document.body.style.overflow = '';
+}
+
+function fecharBibliotecaPorFundo(event) {
+  if (event.target.id === 'library-modal') fecharBiblioteca();
+}
+
+function filtrarRegistrosBiblioteca(registros) {
+  const termo = normalizarCargoChave(document.getElementById('library-search')?.value || '');
+  if (!termo) return registros;
+  return registros.filter(r => {
+    const hay = normalizarCargoChave([
+      r.cargo, r.cargoConsulta, r.empresaNome,
+      r.descricao?.departamento, r.descricao?.objetivo
+    ].filter(Boolean).join(' '));
+    return hay.includes(termo);
+  });
+}
+
+function corDaEmpresa(empresaId) {
+  return EMPRESAS.find(e => e.id === empresaId)?.cor || '#777';
+}
+
+function htmlCardBiblioteca(r) {
+  const cargo = r.cargo || r.descricao?.cargo || r.cargoConsulta || 'Cargo sem nome';
+  const area = r.descricao?.departamento || 'Sem área / departamento';
+  const empresa = r.empresaNome || r.empresaId || 'Empresa';
+  const selecionado = selecionadosBiblioteca.has(r._uid);
+  return `
+    <article class="library-row ${selecionado ? 'selected' : ''}" data-library-uid="${escAttr(r._uid)}">
+      <label class="library-row-select" title="Selecionar ${escAttr(cargo)}">
+        <input class="library-select-item" data-uid="${escAttr(r._uid)}" type="checkbox" ${selecionado ? 'checked' : ''} onchange="alternarSelecaoBiblioteca('${escAttr(r._uid)}', this.checked)">
+      </label>
+      <div class="library-row-main">
+        <div class="library-row-titleline">
+          <span class="library-company-dot" style="background:${corDaEmpresa(r.empresaId)}"></span>
+          <div class="library-row-cargo" title="${escAttr(cargo)}">${esc(cargo)}</div>
+        </div>
+        <div class="library-row-meta">
+          <span class="library-meta-sep">•</span>
+          <span>${esc(area)}</span>
+        </div>
+      </div>
+      <div class="library-date-col">
+        <span class="library-date-label">Salvo em</span>
+        <span class="library-date-value">${formatarDataHora(r.criadoEm)}</span>
+      </div>
+      <div class="library-date-col">
+        <span class="library-date-label">Modificado em</span>
+        <span class="library-date-value">${formatarDataHora(r.modificadoEm)}</span>
+      </div>
+      <div class="library-row-actions">
+        <button class="open" type="button" onclick="abrirRegistroBiblioteca('${escAttr(r._uid)}')">Abrir</button>
+        <button type="button" onclick="abrirOrganizar('${escAttr(r._uid)}')">Organizar</button>
+        <button class="delete" type="button" onclick="excluirRegistroBiblioteca('${escAttr(r._uid)}', true)">Excluir</button>
+      </div>
+    </article>`;
+}
+
+function htmlGrupoBiblioteca(titulo, registros, complemento = '') {
+  if (!registros.length) return '';
+  return `
+    <section class="library-group">
+      <div class="library-group-title">📁 ${esc(titulo)} <span class="library-group-count">${registros.length}</span>${complemento ? `<span class="library-folder-info">${esc(complemento)}</span>` : ''}</div>
+      <div class="library-list">${registros.map(htmlCardBiblioteca).join('')}</div>
+    </section>`;
+}
+
+function alternarSelecaoBiblioteca(uid, marcado) {
+  if (marcado) selecionadosBiblioteca.add(uid);
+  else selecionadosBiblioteca.delete(uid);
+
+  document.querySelectorAll('.library-select-item').forEach(input => {
+    if (input.dataset.uid === uid) input.checked = marcado;
+  });
+  document.querySelectorAll('.library-row').forEach(row => {
+    if (row.dataset.libraryUid === uid) row.classList.toggle('selected', marcado);
+  });
+  atualizarControlesSelecao();
+}
+
+function uidsVisiveisBiblioteca() {
+  return [...new Set(
+    Array.from(document.querySelectorAll('.library-select-item'))
+      .map(input => input.dataset.uid)
+      .filter(Boolean)
+  )];
+}
+
+function selecionarTodosVisiveis(marcado) {
+  uidsVisiveisBiblioteca().forEach(uid => {
+    if (marcado) selecionadosBiblioteca.add(uid);
+    else selecionadosBiblioteca.delete(uid);
+  });
+  document.querySelectorAll('.library-select-item').forEach(input => {
+    input.checked = marcado;
+    input.closest('.library-row')?.classList.toggle('selected', marcado);
+  });
+  atualizarControlesSelecao();
+}
+
+function atualizarControlesSelecao() {
+  const registrosValidos = new Set(listarRegistrosUnicos().map(r => r._uid));
+  [...selecionadosBiblioteca].forEach(uid => {
+    if (!registrosValidos.has(uid)) selecionadosBiblioteca.delete(uid);
+  });
+
+  const total = selecionadosBiblioteca.size;
+  const count = document.getElementById('library-selection-count');
+  const btnPrint = document.getElementById('library-print-selected');
+  const btnPdf = document.getElementById('library-pdf-selected');
+  if (count) count.textContent = `${total} ${total === 1 ? 'selecionado' : 'selecionados'}`;
+  if (btnPrint) btnPrint.disabled = total === 0;
+  if (btnPdf) btnPdf.disabled = total === 0;
+
+  const visiveis = uidsVisiveisBiblioteca();
+  const selecionadosVisiveis = visiveis.filter(uid => selecionadosBiblioteca.has(uid)).length;
+  const master = document.getElementById('library-select-all');
+  if (master) {
+    master.checked = visiveis.length > 0 && selecionadosVisiveis === visiveis.length;
+    master.indeterminate = selecionadosVisiveis > 0 && selecionadosVisiveis < visiveis.length;
+    master.disabled = visiveis.length === 0;
+  }
+}
+
+function registrosSelecionadosBiblioteca() {
+  const mapa = new Map(listarRegistrosUnicos().map(r => [r._uid, r]));
+  return [...selecionadosBiblioteca].map(uid => mapa.get(uid)).filter(Boolean);
+}
+
+function setStatusBiblioteca(texto, erro = false) {
+  const el = document.getElementById('library-bulk-status');
+  if (!el) return;
+  el.textContent = texto || '';
+  el.style.color = erro ? '#B52A2A' : '';
+}
+
+function registroPertencePasta(r, pasta) {
+  if (pasta.tipo === 'empresa') return r.empresaId === pasta.empresaId;
+  if (pasta.tipo === 'segmento') {
+    const area = normalizarCargoChave(r.descricao?.departamento || '');
+    const segmento = normalizarCargoChave(pasta.segmento || '');
+    return Boolean(segmento && area.includes(segmento));
+  }
+  return Array.isArray(r.pastaIds) && r.pastaIds.includes(pasta.id);
+}
+
+function renderBiblioteca() {
+  const body = document.getElementById('library-body');
+  if (!body) return;
+  const todos = listarRegistrosUnicos();
+  const registros = filtrarRegistrosBiblioteca(todos);
+  const modo = document.getElementById('library-view')?.value || 'todos';
+  atualizarBadgeBiblioteca();
+
+  if (!todos.length) {
+    body.innerHTML = '<div class="library-empty"><strong>Sua biblioteca ainda está vazia.</strong><br>Gere uma descrição, faça os ajustes e clique em “Salvar como padrão”.</div>';
+    atualizarControlesSelecao();
+    return;
+  }
+  if (!registros.length) {
+    body.innerHTML = '<div class="library-empty">Nenhum cargo encontrado para esta busca.</div>';
+    atualizarControlesSelecao();
+    return;
+  }
+
+  let html = `<div class="library-summary">${registros.length} de ${todos.length} cargo(s) na biblioteca.</div>`;
+
+  if (modo === 'empresa') {
+    const grupos = new Map();
+    registros.forEach(r => {
+      const chave = r.empresaNome || r.empresaId || 'Sem empresa';
+      if (!grupos.has(chave)) grupos.set(chave, []);
+      grupos.get(chave).push(r);
+    });
+    html += Array.from(grupos.entries()).sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).map(([nome, itens]) => htmlGrupoBiblioteca(nome, itens)).join('');
+  } else if (modo === 'segmento') {
+    const grupos = new Map();
+    registros.forEach(r => {
+      const chave = r.descricao?.departamento?.trim() || 'Sem área / departamento';
+      if (!grupos.has(chave)) grupos.set(chave, []);
+      grupos.get(chave).push(r);
+    });
+    html += Array.from(grupos.entries()).sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).map(([nome, itens]) => htmlGrupoBiblioteca(nome, itens)).join('');
+  } else if (modo === 'pastas') {
+    const pastas = lerPastasBiblioteca();
+    if (!pastas.length) {
+      html += '<div class="library-empty"><strong>Nenhuma pasta criada.</strong><br>Use “Nova pasta” para criar uma pasta inteligente por área ou uma pasta personalizada.</div>';
+    } else {
+      html += pastas.map(p => {
+        const itens = registros.filter(r => registroPertencePasta(r,p));
+        const desc = p.tipo === 'empresa' ? 'Pasta inteligente por empresa' : p.tipo === 'segmento' ? `Pasta inteligente: ${p.segmento}` : 'Pasta personalizada';
+        return htmlGrupoBiblioteca(p.nome, itens, desc) || `<section class="library-group"><div class="library-group-title">📁 ${esc(p.nome)} <span class="library-group-count">0</span><span class="library-folder-info">${esc(desc)}</span> <button type="button" onclick="excluirPasta('${escAttr(p.id)}')" style="margin-left:auto;border:none;background:transparent;color:#B52A2A;cursor:pointer;font-size:11px">Excluir pasta</button></div><div class="library-empty" style="padding:20px">Nenhum cargo nesta pasta.</div></section>`;
+      }).join('');
+    }
+  } else {
+    html += `<div class="library-list">${registros.map(htmlCardBiblioteca).join('')}</div>`;
+  }
+
+  body.innerHTML = html;
+  atualizarControlesSelecao();
+}
+
+
+</script>
+<script>
+/* js/exportacao.js */
+function empresaDoRegistro() { return EMPRESAS[0]; }
+
+function formatarDataSomente(valor) {
+  if (!valor) return today();
+  const data = new Date(valor);
+  return Number.isNaN(data.getTime()) ? today() : data.toLocaleDateString('pt-BR');
+}
+
+function htmlDocumentoBiblioteca(r) {
+  const d = r.descricao || {};
+  const empresa = empresaDoRegistro(r);
+  const cor = empresa.cor || '#777777';
+  const responsabilidades = Array.isArray(d.responsabilidades)
+    ? d.responsabilidades
+    : (d.responsabilidades ? [d.responsabilidades] : []);
+  const logo = renderMarca(empresa, 'doc');
+
+  return `
+    <div class="doc">
+      <div class="doc-header" style="border-bottom-color:${cor}">
+        <div>
+          <div class="doc-main-title">DESCRIÇÃO DE FUNÇÃO</div>
+          <div class="doc-empresa-name">Perfil profissional · Portfólio</div>
+        </div>
+      </div>
+
+      <div class="sec-head" style="background:${cor}">Identificação</div>
+      <div class="row-lbl">
+        <div class="cell-l">CARGO:</div>
+        <div class="cell-v" style="font-weight:600">${esc(d.cargo || r.cargo || r.cargoConsulta || '')}</div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">ÁREA / DEPARTAMENTO:</div>
+        <div class="cell-v">${esc(d.departamento || '')}</div>
+      </div>
+
+      <div class="sec-head" style="background:${cor}">Objetivo do Cargo</div>
+      <div class="block-val">${esc(d.objetivo || '')}</div>
+
+      <div class="sec-head" style="background:${cor}">Responsabilidades</div>
+      <ul class="resp-list">${responsabilidades.map(item => `<li>${esc(item)}</li>`).join('')}</ul>
+
+      <div class="sec-head" style="background:${cor}">Requisitos Mínimos</div>
+      <div class="row-lbl">
+        <div class="cell-l">FORMAÇÃO:</div>
+        <div class="cell-v">${esc(d.formacao || '')}</div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">EXPERIÊNCIA:</div>
+        <div class="cell-v">${esc(d.experiencia || '')}</div>
+      </div>
+      <div class="row-lbl" style="border-bottom:none">
+        <div class="cell-l">CONHECIMENTOS<br>ESPECÍFICOS/<br>HABILIDADES:</div>
+        <div class="cell-v">${esc(d.conhecimentos || '')}</div>
+      </div>
+
+      <div class="doc-footer">
+        <div><strong>Atualizado em:</strong><br>${formatarDataSomente(r.modificadoEm)}</div>
+        <div><strong>Impresso em:</strong><br>${today()}</div>
+        <div class="doc-footer-brand">
+          <div class="doc-footer-brand-copy"><strong>GESTÃO DE GENTE</strong><br>Cargos e Salários</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function cssCompletoDaPagina() {
+  return Array.from(document.styleSheets)
+    .filter(ss => { try { return ss.cssRules; } catch(e) { return false; } })
+    .map(ss => Array.from(ss.cssRules).map(r => r.cssText).join('\n'))
+    .join('\n');
+}
+
+// Links absolutos também funcionam quando o navegador bloqueia cssRules em file://.
+function linksCSSDaPagina() {
+  return Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+    .map(link => `<link rel="stylesheet" href="${escAttr(link.href)}">`).join('\n');
+}
+
+function imprimirSelecionados() {
+  const registros = registrosSelecionadosBiblioteca();
+  if (!registros.length) return;
+
+  const popup = window.open('', '_blank', 'width=960,height=760,scrollbars=yes');
+  if (!popup) {
+    setStatusBiblioteca('O navegador bloqueou a janela de impressão.', true);
+    return;
+  }
+
+  const css = cssCompletoDaPagina();
+  const paginas = registros.map(r => `<section class="batch-print-page">${htmlDocumentoBiblioteca(r)}</section>`).join('');
+  const titulo = registros.length === 1
+    ? `Descrição de Função - ${registros[0].cargo || registros[0].descricao?.cargo || 'Cargo'}`
+    : `Descrições de Função - ${registros.length} cargos`;
+
+  setStatusBiblioteca(`Preparando ${registros.length} ${registros.length === 1 ? 'descrição' : 'descrições'} para impressão...`);
+
+  popup.document.open();
+  popup.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>${esc(titulo)}</title>
+${linksCSSDaPagina()}
+<style>
+${css}
+html,body{background:#fff!important;margin:0!important;padding:0!important}
+.batch-print-page{width:186mm;margin:0 auto;break-after:page;page-break-after:always}
+.batch-print-page:last-child{break-after:auto;page-break-after:auto}
+.batch-print-page .doc{width:186mm;max-width:186mm;box-shadow:none}
+@page{size:A4 portrait;margin:12mm}
+</style>
+</head>
+<body>${paginas}
+<script>
+Promise.all([
+  document.fonts ? document.fonts.ready : Promise.resolve(),
+  new Promise(resolve => {
+    const imgs = document.querySelectorAll('img');
+    if (!imgs.length) return resolve();
+    let restam = imgs.length;
+    imgs.forEach(img => {
+      if (img.complete) { if (--restam === 0) resolve(); }
+      else img.onload = img.onerror = () => { if (--restam === 0) resolve(); };
+    });
+  })
+]).then(() => setTimeout(() => window.print(), 250));
+<\/script>
+</body>
+</html>`);
+  popup.document.close();
+  setTimeout(() => setStatusBiblioteca(''), 1800);
+}
+
+function nomeArquivoSeguro(valor) {
+  return String(valor || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function carregarJsPDF() {
+  if (window.jspdf?.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if (window.__jspdfPromise) return window.__jspdfPromise;
+
+  window.__jspdfPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload = () => window.jspdf?.jsPDF
+      ? resolve(window.jspdf.jsPDF)
+      : reject(new Error('Biblioteca jsPDF não carregou.'));
+    script.onerror = () => {
+      script.remove();
+      reject(new Error('Não foi possível carregar o gerador de PDF.'));
+    };
+    document.head.appendChild(script);
+  });
+  window.__jspdfPromise = window.__jspdfPromise.catch(erro => {
+    window.__jspdfPromise = null;
+    throw erro;
+  });
+  return window.__jspdfPromise;
+}
+
+function nomeArquivoPDF(valor) {
+  return String(valor || '')
+    .replace(/[\\/:*?"<>|]+/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function hexParaRgb(hex) {
+  const limpo = String(hex || '#777777').replace('#', '').trim();
+  const completo = limpo.length === 3
+    ? limpo.split('').map(c => c + c).join('')
+    : limpo.padEnd(6, '7').slice(0, 6);
+  return {
+    r: parseInt(completo.slice(0, 2), 16) || 119,
+    g: parseInt(completo.slice(2, 4), 16) || 119,
+    b: parseInt(completo.slice(4, 6), 16) || 119
+  };
+}
+
+async function gerarPDFRegistroComJsPDF(jsPDF, r) {
+  const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  const d = r.descricao || {};
+  const empresa = empresaDoRegistro(r);
+  const cor = hexParaRgb(empresa.cor || '#777777');
+  const margem = 12;
+  const larguraPagina = 210;
+  const alturaPagina = 297;
+  const largura = larguraPagina - margem * 2;
+  const x = margem;
+  let y = margem;
+  const limiteY = alturaPagina - margem;
+
+  const cargo = d.cargo || r.cargo || r.cargoConsulta || 'Cargo';
+  const responsabilidades = Array.isArray(d.responsabilidades)
+    ? d.responsabilidades
+    : (d.responsabilidades ? [d.responsabilidades] : []);
+  const novaPagina = () => {
+    pdf.addPage();
+    y = margem;
+    desenharCabecalho(false);
+  };
+
+  const garantirEspaco = (alturaNecessaria) => {
+    if (y + alturaNecessaria > limiteY) novaPagina();
+  };
+
+  const textoQuebrado = (texto, larguraMax, tamanho = 9) => {
+    pdf.setFontSize(tamanho);
+    return pdf.splitTextToSize(String(texto || ''), larguraMax);
+  };
+
+  const desenharCabecalho = (comLogo = true) => {
+    const h = 24;
+    pdf.setDrawColor(224, 221, 216);
+    pdf.setLineWidth(0.25);
+    pdf.rect(x, y, largura, h);
+
+    pdf.setTextColor(26,25,23);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.text('DESCRIÇÃO DE FUNÇÃO', x + 6, y + 10);
+    pdf.setTextColor(107,105,102);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.text('Perfil profissional - Portfolio', x + 6, y + 16);
+
+    pdf.setFillColor(cor.r, cor.g, cor.b);
+    pdf.rect(x, y + h - 1.4, largura, 1.4, 'F');
+    y += h;
+  };
+
+  const secao = titulo => {
+    garantirEspaco(8);
+    pdf.setFillColor(cor.r, cor.g, cor.b);
+    pdf.rect(x, y, largura, 7, 'F');
+    pdf.setTextColor(255,255,255);
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(7.5);
+    pdf.text(String(titulo).toUpperCase(), x + 4, y + 4.7);
+    y += 7;
+  };
+
+  const linhaRotulo = (rotulo, valor) => {
+    const wRotulo = 48;
+    const linhas = textoQuebrado(valor, largura - wRotulo - 8, 8.8);
+    const h = Math.max(10, 5.2 * linhas.length + 5);
+    garantirEspaco(h);
+
+    pdf.setFillColor(250,250,248);
+    pdf.rect(x, y, wRotulo, h, 'F');
+    pdf.setDrawColor(224,221,216);
+    pdf.rect(x, y, largura, h);
+    pdf.line(x + wRotulo, y, x + wRotulo, y + h);
+
+    pdf.setTextColor(26,25,23);
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(7.5);
+    const linhasRotulo = pdf.splitTextToSize(String(rotulo), wRotulo - 7);
+    pdf.text(linhasRotulo, x + 4, y + 5.5);
+
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(8.8);
+    pdf.text(linhas, x + wRotulo + 4, y + 5.5);
+    y += h;
+  };
+
+  const blocoTexto = valor => {
+    const linhas = textoQuebrado(valor, largura - 8, 8.8);
+    const h = Math.max(10, 5.0 * linhas.length + 5);
+    garantirEspaco(h);
+    pdf.setDrawColor(224,221,216);
+    pdf.rect(x, y, largura, h);
+    pdf.setTextColor(26,25,23);
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(8.8);
+    pdf.text(linhas, x + 4, y + 5.5);
+    y += h;
+  };
+
+  const listaResponsabilidades = itens => {
+    if (!itens.length) {
+      blocoTexto('');
+      return;
+    }
+    itens.forEach(item => {
+      const linhas = textoQuebrado(item, largura - 13, 8.6);
+      const h = Math.max(6.5, linhas.length * 4.5 + 2);
+      garantirEspaco(h + 1);
+      pdf.setTextColor(26,25,23);
+      pdf.setFont('helvetica','normal');
+      pdf.setFontSize(8.6);
+      pdf.text('•', x + 5, y + 4.6);
+      pdf.text(linhas, x + 9, y + 4.6);
+      y += h;
+    });
+    y += 2;
+  };
+
+  desenharCabecalho(true);
+
+  secao('Identificação');
+  linhaRotulo('CARGO:', cargo);
+  linhaRotulo('ÁREA / DEPARTAMENTO:', d.departamento || '');
+
+  secao('Objetivo do Cargo');
+  blocoTexto(d.objetivo || '');
+
+  secao('Responsabilidades');
+  listaResponsabilidades(responsabilidades);
+
+  secao('Requisitos Mínimos');
+  linhaRotulo('FORMAÇÃO:', d.formacao || '');
+  linhaRotulo('EXPERIÊNCIA:', d.experiencia || '');
+  linhaRotulo('CONHECIMENTOS ESPECÍFICOS / HABILIDADES:', d.conhecimentos || '');
+
+  garantirEspaco(14);
+  pdf.setFillColor(250,250,248);
+  pdf.setDrawColor(224,221,216);
+  pdf.rect(x, y, largura, 13, 'FD');
+  pdf.setTextColor(107,105,102);
+  pdf.setFontSize(7.5);
+  pdf.setFont('helvetica','bold');
+  pdf.text('Atualizado em:', x + 4, y + 5);
+  pdf.text('Impresso em:', x + 67, y + 5);
+  pdf.text('GESTÃO DE GENTE', x + largura - 4, y + 5, {align:'right'});
+  pdf.setFont('helvetica','normal');
+  pdf.text(formatarDataSomente(r.modificadoEm), x + 4, y + 9.5);
+  pdf.text(today(), x + 67, y + 9.5);
+  pdf.text('Cargos e Salários', x + largura - 4, y + 9.5, {align:'right'});
+
+  return pdf;
+}
+
+function esperar(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function baixarPDFSelecionados() {
+  const registros = registrosSelecionadosBiblioteca();
+  if (!registros.length) return;
+
+  const btn = document.getElementById('library-pdf-selected');
+  const textoOriginal = btn?.textContent || '⬇ Baixar PDFs';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando PDFs...';
+  }
+
+  try {
+    const jsPDF = await carregarJsPDF();
+
+    for (let i = 0; i < registros.length; i++) {
+      const r = registros[i];
+      const empresa = empresaDoRegistro(r);
+      const cargo = r.descricao?.cargo || r.cargo || r.cargoConsulta || 'Cargo';
+      const nomeArquivo = `${nomeArquivoPDF(cargo)}.pdf`;
+
+      setStatusBiblioteca(`Gerando ${i + 1} de ${registros.length}: ${empresa.nome} - ${cargo}`);
+
+      const pdf = await gerarPDFRegistroComJsPDF(jsPDF, r);
+      pdf.save(nomeArquivo);
+
+      // Pequeno intervalo evita que o navegador trate todos os downloads como uma única ação.
+      if (i < registros.length - 1) await esperar(350);
+    }
+
+    setStatusBiblioteca(
+      registros.length === 1
+        ? 'PDF baixado.'
+        : `${registros.length} PDFs gerados separadamente. Se o navegador solicitar, permita múltiplos downloads.`
+    );
+  } catch (e) {
+    console.error(e);
+    setStatusBiblioteca('Não foi possível gerar os PDFs. Verifique sua conexão e tente novamente.', true);
+  } finally {
+    if (btn) {
+      btn.textContent = textoOriginal;
+      btn.disabled = selecionadosBiblioteca.size === 0;
+    }
+    setTimeout(() => setStatusBiblioteca(''), 6000);
+  }
+}
+
+</script>
+<script>
+/* js/pastas.js */
+function abrirRegistroBiblioteca(uid) {
+  const r = obterRegistroPorUid(uid);
+  if (!r) return;
+  const empresaExiste = EMPRESAS.some(e => e.id === r.empresaId);
+  if (empresaExiste) selectEmpresa(r.empresaId);
+  cargoConsultaAtual = r.cargoConsulta || r.cargo || r.descricao?.cargo || '';
+  descricaoAtual = JSON.parse(JSON.stringify(r.descricao));
+  modoEdicao = false;
+  estadoPaineisAnalise.complexidade = false;
+  estadoPaineisAnalise.salario = false;
+  estadoPaineisAnalise.grading = false;
+  document.getElementById('cargo-input').value = cargoConsultaAtual;
+  fecharBiblioteca();
+  renderDoc(descricaoAtual, false);
+  setStatus(`✓ Descrição carregada da biblioteca. Salva em ${formatarDataHora(r.criadoEm)}; última modificação em ${formatarDataHora(r.modificadoEm)}.`);
+  window.scrollTo({top: document.getElementById('doc-wrap').offsetTop - 18, behavior:'smooth'});
+}
+
+function excluirRegistroBiblioteca(uid, pedirConfirmacao = true) {
+  const r = obterRegistroPorUid(uid);
+  if (!r) return;
+  if (pedirConfirmacao && !confirm(`Excluir da biblioteca o cargo “${r.cargo || r.descricao?.cargo || 'Cargo'}”?`)) return;
+  const biblioteca = lerBibliotecaDescricoes();
+  Object.keys(biblioteca).forEach(chave => {
+    if (identificadorRegistro(biblioteca[chave]) === uid) delete biblioteca[chave];
+  });
+  if (gravarBibliotecaDescricoes(biblioteca)) {
+    selecionadosBiblioteca.delete(uid);
+    renderBiblioteca();
+    atualizarControlesSelecao();
+    if (pedirConfirmacao) setStatus('✓ Cargo removido da biblioteca.');
+  }
+}
+
+function abrirCriarPasta() {
+  document.getElementById('folder-name').value = '';
+  document.getElementById('folder-type').value = 'personalizada';
+  atualizarCamposPasta();
+  document.getElementById('folder-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('folder-name')?.focus(), 0);
+}
+
+function fecharCriarPasta() {
+  document.getElementById('folder-modal').classList.remove('open');
+  if (!document.getElementById('library-modal').classList.contains('open')) document.body.style.overflow = '';
+}
+
+function fecharPastaPorFundo(event) { if (event.target.id === 'folder-modal') fecharCriarPasta(); }
+
+function segmentosExistentes() {
+  return [...new Set(listarRegistrosUnicos().map(r => r.descricao?.departamento?.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+
+function atualizarCamposPasta() {
+  const tipo = document.getElementById('folder-type').value;
+  const wrap = document.getElementById('folder-criteria-wrap');
+  const help = document.getElementById('folder-type-help');
+  if (tipo === 'empresa') {
+    help.textContent = 'A pasta se atualiza sozinha com todos os cargos salvos da empresa escolhida.';
+    wrap.innerHTML = `<label class="folder-label" for="folder-company">Empresa</label><select class="folder-field-select" id="folder-company">${EMPRESAS.map(e => `<option value="${escAttr(e.id)}">${esc(e.nome)}</option>`).join('')}</select>`;
+  } else if (tipo === 'segmento') {
+    help.textContent = 'A pasta se atualiza sozinha com cargos cuja Área / Departamento corresponda ao segmento informado.';
+    const segmentos = segmentosExistentes();
+    wrap.innerHTML = `<label class="folder-label" for="folder-segment">Segmento / área</label><input class="folder-field-input" id="folder-segment" list="folder-segment-list" maxlength="80" placeholder="Ex: Administrativo, Recursos Humanos, Operações"><datalist id="folder-segment-list">${segmentos.map(s => `<option value="${escAttr(s)}"></option>`).join('')}</datalist>`;
+  } else {
+    help.textContent = 'Você escolhe manualmente quais cargos pertencem a esta pasta pelo botão “Organizar”.';
+    wrap.innerHTML = '';
+  }
+}
+
+function salvarNovaPasta() {
+  const nome = document.getElementById('folder-name').value.trim();
+  const tipo = document.getElementById('folder-type').value;
+  if (!nome) { alert('Informe um nome para a pasta.'); return; }
+  const pasta = {id: novoId('pasta'), nome, tipo, criadoEm: new Date().toISOString()};
+  if (tipo === 'empresa') pasta.empresaId = document.getElementById('folder-company')?.value || '';
+  if (tipo === 'segmento') {
+    pasta.segmento = document.getElementById('folder-segment')?.value.trim() || '';
+    if (!pasta.segmento) { alert('Informe o segmento / área da pasta.'); return; }
+  }
+  const pastas = lerPastasBiblioteca();
+  pastas.push(pasta);
+  if (gravarPastasBiblioteca(pastas)) {
+    fecharCriarPasta();
+    document.getElementById('library-view').value = 'pastas';
+    renderBiblioteca();
+  }
+}
+
+function excluirPasta(id) {
+  const pasta = lerPastasBiblioteca().find(p => p.id === id);
+  if (!pasta || !confirm(`Excluir a pasta “${pasta.nome}”? Os cargos não serão apagados.`)) return;
+  const pastas = lerPastasBiblioteca().filter(p => p.id !== id);
+  if (!gravarPastasBiblioteca(pastas)) return;
+  // Remove apenas a referência da pasta personalizada nos registros.
+  const biblioteca = lerBibliotecaDescricoes();
+  Object.values(biblioteca).forEach(r => {
+    if (Array.isArray(r?.pastaIds)) r.pastaIds = r.pastaIds.filter(pid => pid !== id);
+  });
+  gravarBibliotecaDescricoes(biblioteca);
+  renderBiblioteca();
+}
+
+function abrirOrganizar(uid) {
+  registroOrganizacaoAtual = uid;
+  const r = obterRegistroPorUid(uid);
+  if (!r) return;
+  const personalizadas = lerPastasBiblioteca().filter(p => p.tipo === 'personalizada');
+  const checks = document.getElementById('organize-checks');
+  if (!personalizadas.length) {
+    checks.innerHTML = '<div class="folder-help" style="padding:14px">Você ainda não criou pastas personalizadas. Crie uma pasta do tipo “Personalizada” para organizar cargos manualmente.</div>';
+  } else {
+    checks.innerHTML = personalizadas.map(p => `<label class="folder-check-row"><input type="checkbox" value="${escAttr(p.id)}" ${r.pastaIds?.includes(p.id) ? 'checked' : ''}> <span>${esc(p.nome)}</span></label>`).join('');
+  }
+  document.getElementById('organize-title').textContent = `Organizar: ${r.cargo || r.descricao?.cargo || 'Cargo'}`;
+  document.getElementById('organize-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharOrganizar() {
+  document.getElementById('organize-modal').classList.remove('open');
+  registroOrganizacaoAtual = '';
+  if (!document.getElementById('library-modal').classList.contains('open')) document.body.style.overflow = '';
+}
+function fecharOrganizarPorFundo(event) { if (event.target.id === 'organize-modal') fecharOrganizar(); }
+
+function salvarOrganizacao() {
+  if (!registroOrganizacaoAtual) return;
+  const selecionadas = Array.from(document.querySelectorAll('#organize-checks input[type="checkbox"]:checked')).map(el => el.value);
+  const biblioteca = lerBibliotecaDescricoes();
+  Object.values(biblioteca).forEach(r => {
+    if (identificadorRegistro(r) === registroOrganizacaoAtual) r.pastaIds = [...selecionadas];
+  });
+  if (gravarBibliotecaDescricoes(biblioteca)) {
+    fecharOrganizar();
+    renderBiblioteca();
+  }
+}
+
+
+</script>
+<script>
+/* js/editor.js */
+function coletarDescricaoDoEditor() {
+  const valor = id => (document.getElementById(id)?.value || '').trim();
+  return {
+    cargo: valor('edit-cargo'),
+    departamento: valor('edit-departamento'),
+    objetivo: valor('edit-objetivo'),
+    responsabilidades: Array.from(document.querySelectorAll('.resp-edit-input'))
+      .map(el => el.value.trim())
+      .filter(Boolean),
+    formacao: valor('edit-formacao'),
+    experiencia: valor('edit-experiencia'),
+    conhecimentos: valor('edit-conhecimentos'),
+    grading: {
+      korn_ferry: {
+        familia: valor('edit-kf-familia'),
+        carreira: valor('edit-kf-carreira'),
+        nivel: valor('edit-kf-nivel'),
+        justificativa: valor('edit-kf-justificativa'),
+        fatores: descricaoAtual?.grading?.korn_ferry?.fatores || {}
+      },
+      mercer: {
+        familia: valor('edit-mc-familia'),
+        subfamilia: valor('edit-mc-subfamilia'),
+        nivel: valor('edit-mc-nivel'),
+        justificativa: valor('edit-mc-justificativa'),
+        fatores: descricaoAtual?.grading?.mercer?.fatores || {}
+      }
+    },
+    complexidade: descricaoAtual?.complexidade || null,
+    salario: descricaoAtual?.salario || null
+  };
+}
+
+
+
+</script>
+<script>
+/* js/complexidade.js */
+const COMPLEXIDADE_ROTULOS = {
+  1: '1 — Rotineira',
+  2: '2 — Básica',
+  3: '3 — Intermediária',
+  4: '4 — Avançada',
+  5: '5 — Estratégica'
+};
+
+const COMPLEXIDADE_PESOS = {
+  autonomia: 0.22,
+  impacto: 0.28,
+  problemas: 0.20,
+  conhecimento: 0.15,
+  lideranca: 0.15
+};
+
+function normalizarPontuacaoComplexidade(valor) {
+  const n = Math.round(Number(valor) || 0);
+  return Math.max(1, Math.min(5, n || 1));
+}
+
+function normalizarScoreFator(valor) {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return 1;
+  return Math.max(1, Math.min(5, Math.round(n)));
+}
+
+function rotuloScoreFator(score) {
+  const n = normalizarScoreFator(score);
+  return ['','Muito baixo','Baixo / limitado','Moderado','Alto','Muito alto'][n];
+}
+
+function detectarSenioridadeCargo(cargo) {
+  const titulo = String(cargo || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[._-]+/g, ' ');
+
+  if (/\b(sr|senior|senioridade senior)\b/.test(titulo)) return 'senior';
+  if (/\b(pl|pleno)\b/.test(titulo)) return 'pleno';
+  if (/\b(jr|junior)\b/.test(titulo)) return 'junior';
+  return null;
+}
+
+function descricaoFatorComPiso(fator, piso, motivo) {
+  const atual = fator && typeof fator === 'object'
+    ? { ...fator }
+    : { pontuacao: 1, descricao: String(fator || '') };
+
+  const antes = normalizarScoreFator(atual.pontuacao);
+  const depois = Math.max(antes, piso);
+  atual.pontuacao = depois;
+
+  if (depois > antes) {
+    const base = String(atual.descricao || '').trim();
+    atual.descricao = base
+      ? `${base} Calibração de senioridade: ${motivo}.`
+      : `${rotuloScoreFator(depois)} — ${motivo}.`;
+  }
+  return atual;
+}
+
+function aplicarCalibracaoSenioridade(analise, d) {
+  if (!analise?.fatores) return analise;
+
+  const senioridade = detectarSenioridadeCargo(d?.cargo);
+  if (!senioridade) return analise;
+
+  const fatores = { ...analise.fatores };
+
+  if (senioridade === 'junior') {
+    // Júnior é sinal de desenvolvimento inicial; não força redução de uma
+    // descrição que demonstre maior escopo, apenas evita leitura "rotineira"
+    // para trabalho profissional/técnico quando o conteúdo sustenta isso.
+    fatores.conhecimento = descricaoFatorComPiso(
+      fatores.conhecimento, 2,
+      'o título indica nível Júnior, com conhecimento profissional/técnico em desenvolvimento'
+    );
+  }
+
+  if (senioridade === 'pleno') {
+    fatores.autonomia = descricaoFatorComPiso(
+      fatores.autonomia, 3,
+      'o título indica nível Pleno, normalmente associado a execução com autonomia moderada'
+    );
+    fatores.problemas = descricaoFatorComPiso(
+      fatores.problemas, 3,
+      'o nível Pleno pressupõe tratamento de situações variadas com análise e julgamento'
+    );
+    fatores.conhecimento = descricaoFatorComPiso(
+      fatores.conhecimento, 3,
+      'o nível Pleno pressupõe domínio especializado consolidado'
+    );
+  }
+
+  if (senioridade === 'senior') {
+    fatores.autonomia = descricaoFatorComPiso(
+      fatores.autonomia, 4,
+      'SR/Sênior indica atuação com autonomia elevada dentro da especialidade'
+    );
+    fatores.impacto = descricaoFatorComPiso(
+      fatores.impacto, 3,
+      'SR/Sênior indica impacto relevante em processos, entregas ou decisões da área'
+    );
+    fatores.problemas = descricaoFatorComPiso(
+      fatores.problemas, 4,
+      'SR/Sênior pressupõe resolução de problemas complexos e menos padronizados'
+    );
+    fatores.conhecimento = descricaoFatorComPiso(
+      fatores.conhecimento, 4,
+      'SR/Sênior pressupõe domínio avançado da especialidade'
+    );
+    fatores.lideranca = descricaoFatorComPiso(
+      fatores.lideranca, 3,
+      'SR/Sênior pode exercer influência técnica, mentoria ou coordenação sem exigir gestão formal'
+    );
+  }
+
+  return {
+    ...analise,
+    fatores,
+    senioridadeDetectada: senioridade
+  };
+}
+
+function obterFatorComplexidade(cx, chave) {
+  const f = cx?.fatores?.[chave];
+  if (f && typeof f === 'object') {
+    return {
+      pontuacao: normalizarScoreFator(f.pontuacao),
+      descricao: String(f.descricao || '')
+    };
+  }
+  return {
+    pontuacao: null,
+    descricao: String(f || '—')
+  };
+}
+
+function calcularNivelComplexidade(fatores) {
+  const scores = {};
+  Object.keys(COMPLEXIDADE_PESOS).forEach(chave => {
+    const f = fatores?.[chave];
+    scores[chave] = normalizarScoreFator(typeof f === 'object' ? f.pontuacao : f);
+  });
+
+  let indice =
+    scores.autonomia * COMPLEXIDADE_PESOS.autonomia +
+    scores.impacto * COMPLEXIDADE_PESOS.impacto +
+    scores.problemas * COMPLEXIDADE_PESOS.problemas +
+    scores.conhecimento * COMPLEXIDADE_PESOS.conhecimento +
+    scores.lideranca * COMPLEXIDADE_PESOS.lideranca;
+
+  // Evita que cargos de gestão ampla fiquem presos no centro da escala quando
+  // a própria descrição demonstra impacto, autonomia e complexidade elevados.
+  const gateAvancado =
+    scores.impacto >= 4 &&
+    scores.autonomia >= 4 &&
+    (scores.problemas >= 4 || scores.lideranca >= 4);
+
+  const gateEstrategico =
+    scores.impacto === 5 &&
+    scores.autonomia >= 4 &&
+    scores.problemas >= 4 &&
+    (scores.lideranca >= 4 || scores.conhecimento >= 5);
+
+  if (gateAvancado) indice = Math.max(indice, 3.55);
+  if (gateEstrategico) indice = Math.max(indice, 4.35);
+
+  // Nível 5 exige impacto organizacional real; título sozinho não basta.
+  if (!gateEstrategico) indice = Math.min(indice, 4.24);
+
+  let nivel;
+  if (indice < 1.60) nivel = 1;
+  else if (indice < 2.50) nivel = 2;
+  else if (indice < 3.40) nivel = 3;
+  else if (indice < 4.25) nivel = 4;
+  else nivel = 5;
+
+  return {
+    pontuacao: nivel,
+    nivel: COMPLEXIDADE_ROTULOS[nivel],
+    indice: Math.round(indice * 100) / 100,
+    versao: 2
+  };
+}
+
+function finalizarComplexidade(analise, d) {
+  if (!analise?.fatores) return analise;
+
+  const calibrada = aplicarCalibracaoSenioridade(analise, d);
+  const temScores = Object.values(calibrada.fatores).every(
+    f => f && typeof f === 'object' && Number.isFinite(Number(f.pontuacao))
+  );
+  if (!temScores) return calibrada;
+
+  return {
+    ...calibrada,
+    ...calcularNivelComplexidade(calibrada.fatores),
+    fatores: calibrada.fatores,
+    versao: 3
+  };
+}
+
+function criarFatorLocal(score, descricao) {
+  const pontuacao = normalizarScoreFator(score);
+  return {
+    pontuacao,
+    descricao: `${rotuloScoreFator(pontuacao)} — ${descricao}`
+  };
+}
+
+function complexidadeFallback(d) {
+  const cargo = String(d.cargo || '').toLowerCase();
+  const texto = [
+    d.cargo, d.departamento, d.objetivo,
+    ...(Array.isArray(d.responsabilidades) ? d.responsabilidades : []),
+    d.formacao, d.experiencia, d.conhecimentos
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  const tem = (...termos) => termos.some(t => texto.includes(t));
+  const conta = (...termos) => termos.reduce((acc,t) => acc + (texto.includes(t) ? 1 : 0), 0);
+
+  let autonomia = 1.5;
+  let impacto = 1.5;
+  let problemas = 1.5;
+  let conhecimento = 1.5;
+  let lideranca = 1.0;
+
+  autonomia += conta('autonomia','tomada de decisão','tomar decisões','definir','aprovar','priorizar') * .38;
+  if (tem('responsável por','responsabilidade por','gestão de')) autonomia += .45;
+  if (tem('diretrizes','políticas','governança')) autonomia += .45;
+
+  impacto += conta('indicadores','resultado','resultados','processo','processos','projetos') * .16;
+  impacto += conta('corporativo','organização','companhia','empresa','negócio','negócios','orçamento','budget') * .34;
+  if (tem('estratégia','estratégico','planejamento estratégico')) impacto += .55;
+  if (tem('toda a empresa','nível corporativo','âmbito nacional','múltiplas unidades','unidades de negócio')) impacto += .65;
+
+  problemas += conta('análise','diagnóstico','resolver','solução','soluções','risco','riscos') * .20;
+  problemas += conta('complexo','complexos','transformação','arquitetura','governança','inovação','crítico','críticos') * .32;
+  if (tem('ambiguidade','cenários','trade-off','priorização estratégica')) problemas += .55;
+
+  conhecimento += conta('especializado','especialista','técnico','tecnologia','sistemas','arquitetura','segurança','compliance') * .18;
+  if (tem('ensino superior','graduação','bacharel','superior completo')) conhecimento += .45;
+  if (tem('pós-graduação','mba','mestrado','doutorado','certificação')) conhecimento += .42;
+  if (/\b[5-9]\s*anos\b|\b10\s*anos\b/.test(texto)) conhecimento += .45;
+  else if (/\b[3-4]\s*anos\b/.test(texto)) conhecimento += .28;
+
+  lideranca += conta('liderar','liderança','equipe','gestão de pessoas','coordenar','supervisionar') * .38;
+  lideranca += conta('gestores','gerentes','diretoria','stakeholders','negociação','influenciar') * .36;
+
+  // O título é um sinal complementar, nunca o único critério.
+  if (/\b(ceo|cfo|cio|cto|chief|vice[- ]?presidente|diretor executivo|diretora executiva)\b/.test(cargo)) {
+    autonomia = Math.max(autonomia, 4.7);
+    impacto = Math.max(impacto, 4.8);
+    problemas = Math.max(problemas, 4.4);
+    lideranca = Math.max(lideranca, 4.7);
+  } else if (/\bgerente geral\b/.test(cargo)) {
+    autonomia = Math.max(autonomia, 4.1);
+    impacto = Math.max(impacto, 4.2);
+    problemas = Math.max(problemas, 3.8);
+    lideranca = Math.max(lideranca, 4.2);
+  } else if (/\bgerente\b/.test(cargo)) {
+    autonomia = Math.max(autonomia, 3.6);
+    impacto = Math.max(impacto, 3.5);
+    lideranca = Math.max(lideranca, 3.8);
+  } else if (/\bcoordenador|coordenadora\b/.test(cargo)) {
+    autonomia = Math.max(autonomia, 3.1);
+    impacto = Math.max(impacto, 3.0);
+    lideranca = Math.max(lideranca, 3.3);
+  } else if (/\bsupervisor|supervisora\b/.test(cargo)) {
+    autonomia = Math.max(autonomia, 2.8);
+    lideranca = Math.max(lideranca, 3.0);
+  } else if (/\bauxiliar|ajudante\b/.test(cargo)) {
+    autonomia = Math.min(autonomia, 2.1);
+    impacto = Math.min(impacto, 2.0);
+  }
+
+  const fatores = {
+    autonomia: criarFatorLocal(autonomia, 'liberdade para decidir, priorizar e definir caminhos'),
+    impacto: criarFatorLocal(impacto, 'amplitude dos resultados, processos e áreas afetados'),
+    problemas: criarFatorLocal(problemas, 'variedade, ambiguidade e dificuldade dos problemas tratados'),
+    conhecimento: criarFatorLocal(conhecimento, 'profundidade técnica, formação e experiência exigidas'),
+    lideranca: criarFatorLocal(lideranca, 'necessidade de liderar, coordenar ou influenciar pessoas e áreas')
+  };
+
+  const base = {
+    fatores,
+    justificativa: 'Estimativa local calculada por cinco dimensões ponderadas. Configure a chave Groq para uma leitura ainda mais contextual da descrição.'
+  };
+  return finalizarComplexidade(base, d);
+}
+
+async function recalcularComplexidadeComIA(d, silencioso = false) {
+  if (!d) return null;
+  const chave = getChave();
+
+  if (!chave) {
+    const fallback = complexidadeFallback(d);
+    if (!silencioso) setStatus('✓ Complexidade recalculada localmente por cinco dimensões.');
+    return fallback;
+  }
+
+  const btnRecalc = document.getElementById('btn-recalculate-complexity');
+  if (btnRecalc) btnRecalc.disabled = true;
+  if (!silencioso) setStatus('<span class="spinner"></span> Recalculando os fatores de complexidade...');
+
+  const fatorSchema = {
+    type: 'object',
+    properties: {
+      pontuacao: { type: 'integer', minimum: 1, maximum: 5 },
+      descricao: { type: 'string' }
+    },
+    required: ['pontuacao','descricao'],
+    additionalProperties: false
+  };
+
+  const schema = {
+    type: 'object',
+    properties: {
+      fatores: {
+        type: 'object',
+        properties: {
+          autonomia: fatorSchema,
+          impacto: fatorSchema,
+          problemas: fatorSchema,
+          conhecimento: fatorSchema,
+          lideranca: fatorSchema
+        },
+        required: ['autonomia','impacto','problemas','conhecimento','lideranca'],
+        additionalProperties: false
+      },
+      justificativa: { type: 'string' }
+    },
+    required: ['fatores','justificativa'],
+    additionalProperties: false
+  };
+
+  const prompt = `Você é especialista em arquitetura de cargos e análise de trabalho.
+
+Avalie a COMPLEXIDADE INTRÍNSECA do cargo abaixo. Não avalie salário, desempenho, prestígio do título ou a pessoa ocupante.
+
+Dê uma nota INDEPENDENTE de 1 a 5 para cada dimensão. Não tente fazer todas as notas ficarem próximas de 3.
+
+AUTONOMIA
+1 = segue instruções detalhadas e tem pouca decisão.
+2 = decide dentro de procedimentos conhecidos.
+3 = escolhe abordagens e prioridades dentro de políticas definidas.
+4 = define caminhos, prioridades e decisões relevantes com ampla autonomia.
+5 = define diretrizes, políticas ou decisões de alcance organizacional.
+
+IMPACTO
+1 = impacto individual/local muito restrito.
+2 = afeta uma rotina, equipe pequena ou processo delimitado.
+3 = afeta uma área, processo relevante ou resultados funcionais.
+4 = afeta múltiplas áreas, unidades, orçamento relevante ou resultados corporativos.
+5 = afeta estratégia, portfólio, negócio ou organização como um todo.
+
+PROBLEMAS
+1 = repetitivos e padronizados.
+2 = conhecidos, com alguma variação.
+3 = variados, exigem análise e julgamento.
+4 = complexos, multidisciplinares, com riscos e trade-offs relevantes.
+5 = altamente ambíguos, inéditos ou estratégicos.
+
+CONHECIMENTO
+1 = treinamento básico.
+2 = conhecimento técnico/operacional definido.
+3 = conhecimento especializado e experiência relevante.
+4 = domínio avançado, multidisciplinar ou profundo.
+5 = referência organizacional/mercado, integração de múltiplos domínios.
+
+LIDERANÇA / INFLUÊNCIA
+1 = sem liderança ou influência relevante.
+2 = cooperação e orientação pontual.
+3 = coordenação, influência frequente ou liderança de equipe/processos.
+4 = liderança de equipes/gestores, negociação relevante ou influência multifuncional.
+5 = liderança organizacional, executiva ou influência estratégica ampla.
+
+IMPORTANTE:
+- O título é evidência auxiliar e deve ser interpretado corretamente.
+- Considere JR/Júnior como Júnior, PL/Pleno como Pleno e SR/Sênior/Senior como Sênior.
+- Senioridade NÃO define sozinha a complexidade final, mas deve ser coerente com autonomia, conhecimento e dificuldade dos problemas descritos.
+- Um cargo SR/Sênior não deve ser classificado como trabalho básico/rotineiro se a descrição estiver coerente com atuação Sênior.
+- O título "Gerente" não recebe nota alta automaticamente.
+- Porém, se a descrição demonstrar gestão ampla, autonomia, orçamento, governança, liderança de gestores, estratégia ou impacto corporativo, reflita isso nas notas.
+- Use toda a escala de 1 a 5. Evite escolher 3 por padrão.
+- Na descrição de cada fator, explique brevemente o que na descrição justificou a nota.
+
+Cargo: ${d.cargo || ''}
+Área: ${d.departamento || ''}
+Objetivo: ${d.objetivo || ''}
+Responsabilidades: ${(d.responsabilidades || []).join(' | ')}
+Formação: ${d.formacao || ''}
+Experiência: ${d.experiencia || ''}
+Conhecimentos: ${d.conhecimentos || ''}
+
+A justificativa final deve ter no máximo duas frases.`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${chave}`
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-oss-120b',
+        temperature: 0.1,
+        max_completion_tokens: 1200,
+        reasoning_effort: 'low',
+        reasoning_format: 'hidden',
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'complexidade_cargo_v2',
+            strict: true,
+            schema
+          }
+        },
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || `Erro HTTP ${res.status}`);
+    const conteudo = data?.choices?.[0]?.message?.content;
+    if (!conteudo) throw new Error('A Groq respondeu sem conteúdo utilizável.');
+
+    const analise = JSON.parse(conteudo.replace(/```json|```/g, '').trim());
+    const final = finalizarComplexidade(analise, d);
+    if (!silencioso) setStatus(`✓ Complexidade recalculada: ${final.nivel}.`);
+    return final;
+  } catch (e) {
+    console.warn('Falha no recálculo por IA; usando cálculo local:', e);
+    const fallback = complexidadeFallback(d);
+    fallback.justificativa = 'A análise por IA não pôde ser concluída; foi utilizada a avaliação local por cinco dimensões.';
+    if (!silencioso) setStatus('<span class="err">⚠ A IA não respondeu. A complexidade foi recalculada localmente.</span>');
+    return fallback;
+  } finally {
+    if (btnRecalc) btnRecalc.disabled = false;
+  }
+}
+
+async function recalcularComplexidadeAtual() {
+  if (!descricaoAtual) return;
+  const d = modoEdicao ? coletarDescricaoDoEditor() : JSON.parse(JSON.stringify(descricaoAtual));
+  d.complexidade = await recalcularComplexidadeComIA(d);
+  descricaoAtual = d;
+  renderDoc(descricaoAtual, modoEdicao);
+}
+
+
+
+</script>
+<script>
+/* js/salarios.js */
+const SALARIO_CAGED_BR_2025 = 2294.62;
+const SALARIO_CAGED_UF_2025 = {
+  RO:1920.06, AC:1793.63, AM:2008.09, RR:1800.83, PA:2073.90, AP:1853.22, TO:1975.45,
+  MA:2025.64, PI:2028.09, CE:2019.48, RN:1835.88, PB:1845.59, PE:2007.21, AL:1831.18,
+  SE:1972.70, BA:2012.00, MG:2152.25, ES:2124.29, RJ:2313.37, SP:2597.14,
+  PR:2240.24, SC:2334.28, RS:2171.51, MS:2118.78, MT:2263.20, GO:2044.56, DF:2443.02
+};
+const UF_NOMES = {
+  AC:'Acre', AL:'Alagoas', AP:'Amapá', AM:'Amazonas', BA:'Bahia', CE:'Ceará',
+  DF:'Distrito Federal', ES:'Espírito Santo', GO:'Goiás', MA:'Maranhão',
+  MT:'Mato Grosso', MS:'Mato Grosso do Sul', MG:'Minas Gerais', PA:'Pará',
+  PB:'Paraíba', PR:'Paraná', PE:'Pernambuco', PI:'Piauí', RJ:'Rio de Janeiro',
+  RN:'Rio Grande do Norte', RS:'Rio Grande do Sul', RO:'Rondônia', RR:'Roraima',
+  SC:'Santa Catarina', SP:'São Paulo', SE:'Sergipe', TO:'Tocantins'
+};
+const UF_ORDEM = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+let mapaSalarioChart = null;
+let ufSalarioSelecionada = 'SP';
+
+const estadoPaineisAnalise = {
+  complexidade: false,
+  salario: false,
+  grading: false
+};
+
+function moedaBR(valor) {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return '—';
+  return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL', maximumFractionDigits:0});
+}
+
+function normalizarTextoSalario(valor) {
+  return String(valor || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[._-]+/g, ' ');
+}
+
+function assinaturaPesquisaSalarial(d) {
+  const base = {
+    cargo: String(d?.cargo || '').trim(),
+    departamento: String(d?.departamento || '').trim(),
+    objetivo: String(d?.objetivo || '').trim(),
+    responsabilidades: Array.isArray(d?.responsabilidades)
+      ? d.responsabilidades.map(x => String(x || '').trim())
+      : [],
+    formacao: String(d?.formacao || '').trim(),
+    experiencia: String(d?.experiencia || '').trim(),
+    conhecimentos: String(d?.conhecimentos || '').trim(),
+    complexidade: d?.complexidade ? {
+      nivel: d.complexidade.nivel || '',
+      pontuacao: d.complexidade.pontuacao || '',
+      indice: d.complexidade.indice || ''
+    } : null
+  };
+
+  const texto = JSON.stringify(base);
+  let hash = 2166136261;
+  for (let i = 0; i < texto.length; i++) {
+    hash ^= texto.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `sal-${(hash >>> 0).toString(16)}`;
+}
+
+const BENCHMARKS_SALARIAIS_PUBLICOS = [
+  {
+    id: 'atendente-locacao',
+    match: cargo => /\batendente\b/.test(cargo) && /\blocacao\b/.test(cargo),
+    cargoReferencia: 'Atendente de Locação',
+    mediaBrasil: 2098,
+    p25Brasil: 1621,
+    p75Brasil: 2983,
+    atualizadoEm: '2026-09-05',
+    fonte: 'Indeed',
+    fonteNota: 'Média Brasil baseada em salários/anúncios informados ao Indeed.',
+    ufs: {
+      SP: {
+        media: 2022,
+        atualizadoEm: '2026-09-08',
+        fonte: 'Indeed',
+        observacao: 'Média específica para São Paulo, SP.'
+      }
+    }
+  }
+];
+
+function buscarBenchmarkSalarialPublico(d) {
+  const cargo = normalizarTextoSalario(d?.cargo);
+  return BENCHMARKS_SALARIAIS_PUBLICOS.find(b => {
+    try { return b.match(cargo); } catch(e) { return false; }
+  }) || null;
+}
+
+function salarioPorBenchmarkPublico(benchmark, d) {
+  const salario = normalizarPesquisaSalarial({
+    mediaBrasil: benchmark.mediaBrasil,
+    p25Brasil: benchmark.p25Brasil,
+    p75Brasil: benchmark.p75Brasil,
+    justificativa: `Benchmark público reconhecido para ${benchmark.cargoReferencia}.`,
+    origem: 'benchmark_publico',
+    atualizadoEm: new Date().toISOString(),
+    desatualizada: false,
+    assinatura: assinaturaPesquisaSalarial(d),
+    benchmark: {
+      id: benchmark.id,
+      cargoReferencia: benchmark.cargoReferencia,
+      fonte: benchmark.fonte,
+      atualizadoEm: benchmark.atualizadoEm,
+      fonteNota: benchmark.fonteNota
+    }
+  });
+
+  if (benchmark.ufs) {
+    Object.entries(benchmark.ufs).forEach(([uf, dado]) => {
+      if (!salario.porUF?.[uf]) return;
+      salario.porUF[uf] = {
+        ...salario.porUF[uf],
+        media: Math.round(dado.media),
+        // Mantém amplitude semelhante à faixa nacional, mas centrada na média local.
+        p25: Math.round(dado.media * (benchmark.p25Brasil / benchmark.mediaBrasil)),
+        p75: Math.round(dado.media * (benchmark.p75Brasil / benchmark.mediaBrasil)),
+        benchmarkDireto: true,
+        fonte: dado.fonte || benchmark.fonte,
+        atualizadoEm: dado.atualizadoEm || benchmark.atualizadoEm,
+        observacao: dado.observacao || ''
+      };
+    });
+  }
+
+  return salario;
+}
+
+function obterFaixaCoerenciaSalarial(d) {
+  const cargo = normalizarTextoSalario(d?.cargo);
+  const texto = normalizarTextoSalario([
+    d?.cargo,
+    d?.departamento,
+    d?.objetivo,
+    ...(Array.isArray(d?.responsabilidades) ? d.responsabilidades : []),
+    d?.conhecimentos
+  ].filter(Boolean).join(' '));
+
+  const senioridade = detectarSenioridadeCargo(d?.cargo);
+  const especialidadeValorizada = /\b(ti|tecnologia|software|dados|data|cloud|nuvem|sap|cyber|seguranca da informacao|devops|engenharia de dados|machine learning|ia|inteligencia artificial|mercado financeiro|investimentos)\b/.test(texto);
+
+  let faixa = {
+    trilha: 'Profissional',
+    nivel: senioridade || 'não informado',
+    minMedia: 3000,
+    refMedia: 4300,
+    maxMedia: 6200
+  };
+
+  if (/\batendente\b/.test(cargo)) {
+    faixa = { trilha:'Atendimento / Operacional', nivel:'Atendente', minMedia:1800, refMedia:2200, maxMedia:2900 };
+  } else if (/\b(auxiliar|ajudante)\b/.test(cargo)) {
+    faixa = { trilha:'Suporte / Operacional', nivel:'Auxiliar', minMedia:1700, refMedia:2300, maxMedia:3200 };
+  } else if (/\bassistente\b/.test(cargo)) {
+    faixa = { trilha:'Suporte', nivel:'Assistente', minMedia:2000, refMedia:2900, maxMedia:4000 };
+  } else if (/\banalista\b/.test(cargo)) {
+    if (senioridade === 'junior') {
+      faixa = { trilha:'Profissional', nivel:'Analista Júnior', minMedia:2800, refMedia:3600, maxMedia:4600 };
+    } else if (senioridade === 'pleno') {
+      faixa = { trilha:'Profissional', nivel:'Analista Pleno', minMedia:4000, refMedia:5200, maxMedia:6800 };
+    } else if (senioridade === 'senior') {
+      faixa = { trilha:'Profissional', nivel:'Analista Sênior', minMedia:5200, refMedia:6800, maxMedia:9000 };
+    } else {
+      faixa = { trilha:'Profissional', nivel:'Analista', minMedia:3300, refMedia:4500, maxMedia:6200 };
+    }
+  } else if (/\b(especialista|consultor senior|consultora senior)\b/.test(cargo)) {
+    faixa = { trilha:'Especialista', nivel:'Especialista', minMedia:6500, refMedia:8500, maxMedia:12500 };
+  } else if (/\b(coordenador|coordenadora)\b/.test(cargo)) {
+    faixa = { trilha:'Gestão', nivel:'Coordenação', minMedia:6500, refMedia:8500, maxMedia:12500 };
+  } else if (/\bgerente geral\b/.test(cargo)) {
+    faixa = { trilha:'Gestão', nivel:'Gerência Geral', minMedia:13000, refMedia:18000, maxMedia:26000 };
+  } else if (/\bgerente\b/.test(cargo)) {
+    faixa = { trilha:'Gestão', nivel:'Gerência', minMedia:9500, refMedia:13000, maxMedia:19000 };
+  } else if (/\b(diretor|diretora|vice presidente|vice-presidente|chief|ceo|cfo|cio|cto)\b/.test(cargo)) {
+    faixa = { trilha:'Executiva', nivel:'Direção / Executiva', minMedia:16000, refMedia:24000, maxMedia:38000 };
+  } else if (/\b(supervisor|supervisora)\b/.test(cargo)) {
+    faixa = { trilha:'Gestão / Supervisão', nivel:'Supervisão', minMedia:4500, refMedia:6200, maxMedia:8800 };
+  }
+
+  // Especialidades mais valorizadas podem ampliar a faixa de profissionais,
+  // mas não mudam a trilha hierárquica. Analista SR continua Analista SR.
+  if (especialidadeValorizada && faixa.trilha === 'Profissional') {
+    faixa = {
+      ...faixa,
+      minMedia: Math.round(faixa.minMedia * 1.03),
+      refMedia: Math.round(faixa.refMedia * 1.06),
+      maxMedia: Math.round(faixa.maxMedia * 1.10),
+      especialidadeValorizada: true
+    };
+  }
+
+  return faixa;
+}
+
+function limitarNumero(valor, minimo, maximo) {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return minimo;
+  return Math.max(minimo, Math.min(maximo, n));
+}
+
+function calibrarPesquisaSalarialIA(resultado, d) {
+  const faixa = obterFaixaCoerenciaSalarial(d);
+
+  const mediaOriginal = Math.max(1, Math.round(Number(resultado.media_brasil) || faixa.refMedia));
+
+  // Limita a IA e também suaviza extremos em direção à referência central.
+  // Isso evita que a estimativa sempre "encoste no teto" da faixa.
+  const limitada = limitarNumero(mediaOriginal, faixa.minMedia, faixa.maxMedia);
+  const mediaSuavizada = limitada > faixa.refMedia
+    ? faixa.refMedia + (limitada - faixa.refMedia) * 0.55
+    : faixa.refMedia - (faixa.refMedia - limitada) * 0.70;
+
+  const media = Math.round(limitarNumero(mediaSuavizada, faixa.minMedia, faixa.maxMedia));
+
+  // Mantém uma faixa salarial plausível em torno da média calibrada.
+  const p25Min = Math.round(media * 0.75);
+  const p25Max = Math.round(media * 0.95);
+  const p75Min = Math.round(media * 1.08);
+  const p75Max = Math.round(Math.max(media * 1.30, faixa.maxMedia * 1.08));
+
+  const p25 = Math.round(limitarNumero(
+    Number(resultado.p25_brasil) || media * .82,
+    p25Min,
+    p25Max
+  ));
+  const p75 = Math.round(limitarNumero(
+    Number(resultado.p75_brasil) || media * 1.22,
+    p75Min,
+    p75Max
+  ));
+
+  return {
+    mediaBrasil: media,
+    p25Brasil: p25,
+    p75Brasil: p75,
+    justificativa: String(resultado.justificativa || ''),
+    origem: 'ia',
+    atualizadoEm: new Date().toISOString(),
+    desatualizada: false,
+    faixaCoerencia: faixa,
+    calibracao: {
+      mediaOriginalIA: mediaOriginal,
+      mediaAjustada: media,
+      foiAjustada: media !== mediaOriginal
+    }
+  };
+}
+
+function montarSalariosPorUF(mediaBrasil, p25Brasil, p75Brasil) {
+  const media = Math.max(1, Number(mediaBrasil) || 1);
+  const p25 = Math.max(1, Number(p25Brasil) || media * .80);
+  const p75 = Math.max(p25, Number(p75Brasil) || media * 1.25);
+  const porUF = {};
+
+  UF_ORDEM.forEach(uf => {
+    const mediaCaged = SALARIO_CAGED_UF_2025[uf];
+    const indice = mediaCaged / SALARIO_CAGED_BR_2025;
+    porUF[uf] = {
+      media: Math.round(media * indice),
+      p25: Math.round(p25 * indice),
+      p75: Math.round(p75 * indice),
+      indice: Math.round(indice * 1000) / 1000,
+      mediaCagedGeral2025: mediaCaged
+    };
+  });
+  return porUF;
+}
+
+function normalizarPesquisaSalarial(s) {
+  if (!s || !Number.isFinite(Number(s.mediaBrasil))) return null;
+  const media = Math.round(Number(s.mediaBrasil));
+  const p25 = Math.round(Number(s.p25Brasil) || media * .8);
+  const p75 = Math.round(Number(s.p75Brasil) || media * 1.25);
+  return {
+    ...s,
+    mediaBrasil: media,
+    p25Brasil: Math.min(p25, media),
+    p75Brasil: Math.max(p75, media),
+    porUF: montarSalariosPorUF(media, p25, p75)
+  };
+}
+
+function persistirPesquisaSalarialSemAlterarData() {
+  if (!descricaoAtual || !cargoConsultaAtual || !existeDescricaoSalva(cargoConsultaAtual)) return;
+  const biblioteca = lerBibliotecaDescricoes();
+  const registro = buscarRegistroSalvo(cargoConsultaAtual) ||
+    (descricaoAtual.cargo ? buscarRegistroSalvo(descricaoAtual.cargo) : null);
+  if (!registro) return;
+  const uid = identificadorRegistro(registro);
+
+  Object.values(biblioteca).forEach(item => {
+    if (identificadorRegistro(item) === uid && item?.descricao) {
+      item.descricao.salario = descricaoAtual.salario
+        ? JSON.parse(JSON.stringify(descricaoAtual.salario))
+        : null;
+    }
+  });
+  gravarBibliotecaDescricoes(biblioteca);
+}
+
+function carregarScriptMapa(src, id) {
+  return new Promise((resolve, reject) => {
+    const existente = document.getElementById(id);
+    if (existente) {
+      if (existente.dataset.loaded === '1') return resolve();
+      existente.addEventListener('load', () => resolve(), { once: true });
+      existente.addEventListener('error', () => reject(new Error('Falha ao carregar script.')), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = id;
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = '1';
+      resolve();
+    };
+    script.onerror = () => {
+      script.remove();
+      reject(new Error('Falha ao carregar script.'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+async function carregarScriptComFallback(urls, idBase) {
+  let ultimoErro = null;
+  for (let i = 0; i < urls.length; i++) {
+    const id = `${idBase}-${i}`;
+    try {
+      await carregarScriptMapa(urls[i], id);
+      return;
+    } catch (e) {
+      ultimoErro = e;
+    }
+  }
+  throw ultimoErro || new Error('Não foi possível carregar o recurso do mapa.');
+}
+
+async function carregarMapaBrasil() {
+  if (!window.Highcharts?.mapChart) {
+    await carregarScriptComFallback([
+      'https://code.highcharts.com/maps/highmaps.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/highcharts/12.3.0/highmaps.js'
+    ], 'highmaps-lib');
+  }
+
+  if (window.Highcharts?.maps?.['countries/br/br-all']) {
+    return { Highcharts: window.Highcharts, mapKey: 'countries/br/br-all' };
+  }
+
+  await carregarScriptComFallback([
+    'https://code.highcharts.com/mapdata/countries/br/br-all.js',
+    'https://cdn.jsdelivr.net/npm/@highcharts/map-collection/countries/br/br-all.js'
+  ], 'highmaps-br-map');
+
+  if (!window.Highcharts?.maps?.['countries/br/br-all']) {
+    throw new Error('Os dados do mapa do Brasil não foram carregados.');
+  }
+
+  return { Highcharts: window.Highcharts, mapKey: 'countries/br/br-all' };
+}
+
+function opcoesUFHtml(selecionada) {
+  return UF_ORDEM.map(uf =>
+    `<option value="${uf}" ${uf === selecionada ? 'selected' : ''}>${UF_NOMES[uf]} (${uf})</option>`
+  ).join('');
+}
+
+function htmlDetalheSalarioUF(salario, uf) {
+  const dado = salario?.porUF?.[uf];
+  if (!dado) return '<div class="salary-state-detail">Selecione um estado.</div>';
+  const variacao = (dado.indice - 1) * 100;
+  const sinal = variacao > 0 ? '+' : '';
+  const cor = empresaAtual?.cor || '#C0121A';
+  return `
+    <div class="salary-state-detail">
+      <div class="salary-state-name">${esc(UF_NOMES[uf])} — ${uf}</div>
+      <div class="salary-state-range" style="color:${cor}">
+        <span class="salary-range-label">Faixa estimada</span>
+        <span class="salary-range-value">${moedaBR(dado.p25)} a ${moedaBR(dado.p75)} / mês</span>
+      </div>
+      <div class="salary-state-index">
+        ${dado.benchmarkDireto
+          ? `Valor estadual baseado diretamente em benchmark público (${esc(dado.fonte || 'fonte pública')})${dado.atualizadoEm ? `, referência ${new Date(dado.atualizadoEm + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}.`
+          : `Ajuste geográfico: <strong>${sinal}${variacao.toFixed(1).replace('.', ',')}%</strong> vs. Brasil.<br>
+             Índice baseado na relação do salário médio geral de admissão do Novo CAGED/2025:
+             ${moedaBR(dado.mediaCagedGeral2025)} na UF vs. ${moedaBR(SALARIO_CAGED_BR_2025)} no Brasil.`}
+      </div>
+    </div>`;
+}
+
+function selecionarUFSalario(uf) {
+  if (!descricaoAtual?.salario?.porUF?.[uf]) return;
+  ufSalarioSelecionada = uf;
+  descricaoAtual.salario.ufSelecionada = uf;
+
+  const select = document.getElementById('salary-state-select');
+  if (select && select.value !== uf) select.value = uf;
+  const detalhe = document.getElementById('salary-state-detail-wrap');
+  if (detalhe) detalhe.innerHTML = htmlDetalheSalarioUF(descricaoAtual.salario, uf);
+
+  if (mapaSalarioChart) {
+    mapaSalarioChart.series?.[0]?.points?.forEach(p => p.select(p.custom?.uf === uf, false));
+  }
+}
+
+async function renderMapaSalarios(salario) {
+  const host = document.getElementById('salary-map');
+  if (!host || !salario?.porUF) return;
+
+  const painel = document.getElementById('salary-panel-wrap');
+  if (painel?.classList.contains('is-hidden')) return;
+
+  host.innerHTML = '<div class="salary-map-loading"><span>Carregando mapa do Brasil...</span></div>';
+
+  try {
+    const pacote = await carregarMapaBrasil();
+    const Highcharts = pacote.Highcharts;
+    const mapKey = pacote.mapKey;
+    const mapData = Highcharts.maps[mapKey];
+    const cor = empresaAtual?.cor || '#C0121A';
+
+    const dados = UF_ORDEM.map(uf => ({
+      'hc-key': `br-${uf.toLowerCase()}`,
+      value: salario.porUF[uf].media,
+      custom: { uf, nome: UF_NOMES[uf] }
+    }));
+
+    if (mapaSalarioChart) {
+      try { mapaSalarioChart.destroy(); } catch(e) {}
+      mapaSalarioChart = null;
+    }
+
+    host.innerHTML = '';
+
+    mapaSalarioChart = Highcharts.mapChart('salary-map', {
+      chart: {
+        map: mapKey,
+        backgroundColor: 'transparent',
+        height: 360,
+        spacing: [8,8,8,8]
+      },
+      title: { text: null },
+      credits: { enabled: false },
+      legend: { enabled: false },
+      mapNavigation: {
+        enabled: true,
+        enableMouseWheelZoom: false,
+        buttonOptions: { verticalAlign: 'bottom' }
+      },
+      colorAxis: {
+        min: Math.min(...UF_ORDEM.map(uf => salario.porUF[uf].media)),
+        max: Math.max(...UF_ORDEM.map(uf => salario.porUF[uf].media)),
+        minColor: '#F1EFEB',
+        maxColor: cor,
+        labels: { enabled: false }
+      },
+      tooltip: {
+        useHTML: true,
+        pointFormatter: function() {
+          const uf = this.custom?.uf;
+          const d = salario.porUF?.[uf];
+          return `<strong>${esc(UF_NOMES[uf] || uf)}</strong><br>
+                  Média estimada: <strong>${moedaBR(d?.media)}</strong><br>
+                  <span style="font-size:10px">Clique para selecionar</span>`;
+        }
+      },
+      plotOptions: {
+        map: {
+          borderColor: '#FFFFFF',
+          borderWidth: 1,
+          nullColor: '#EEECE8',
+          states: {
+            hover: { brightness: -0.08 },
+            select: { color: cor }
+          },
+          point: {
+            events: {
+              click: function() {
+                if (this.custom?.uf) selecionarUFSalario(this.custom.uf);
+              }
+            }
+          }
+        }
+      },
+      series: [{
+        data: dados,
+        mapData,
+        joinBy: 'hc-key',
+        name: 'Média salarial estimada',
+        allowPointSelect: true,
+        cursor: 'pointer',
+        dataLabels: {
+          enabled: true,
+          formatter: function() {
+            return this.point.custom?.uf || '';
+          },
+          style: {
+            fontSize: '8px',
+            fontWeight: '700',
+            textOutline: '1px #fff'
+          }
+        }
+      }]
+    });
+
+    selecionarUFSalario(salario.ufSelecionada || ufSalarioSelecionada || 'SP');
+  } catch(e) {
+    console.warn('Mapa do Brasil indisponível:', e);
+    host.innerHTML = `<div class="salary-map-loading">
+      O mapa visual não pôde ser carregado neste navegador.<br>
+      Você ainda pode consultar qualquer estado pelo seletor ao lado.
+    </div>`;
+  }
+}
+
+function htmlPesquisaSalarial(d) {
+  const s = normalizarPesquisaSalarial(d?.salario);
+  const selecionada = s?.ufSelecionada || ufSalarioSelecionada || 'SP';
+
+  if (!s) {
+    return `
+      <div class="salary-panel is-hidden" id="salary-panel-wrap">
+        <div class="salary-card">
+          <div class="salary-head">
+            <div class="salary-title-wrap">
+              <div class="salary-title">💰 Pesquisa Salarial por Estado</div>
+              <div class="salary-subtitle">Calcule uma referência salarial para o cargo e navegue pelas UFs em um mapa do Brasil. A estimativa considera o cargo, senioridade e descrição; o ajuste geográfico usa um índice do Novo CAGED/2025.</div>
+            </div>
+            <span class="salary-badge">Referência</span>
+          </div>
+          <div class="salary-actions">
+            <button id="btn-calc-salary" class="salary-btn primary" type="button" onclick="calcularPesquisaSalarial()">Calcular estimativa salarial</button>
+          </div>
+          <div class="salary-empty">
+            O sistema primeiro procura um <strong>benchmark público específico para o cargo</strong>.
+            Quando não houver correspondência, calcula uma estimativa conservadora pela IA. Depois você poderá comparar os estados no mapa do Brasil.
+          </div>
+          <div class="salary-source"><strong>Índice geográfico:</strong> salários médios gerais de admissão por UF, Novo CAGED, janeiro–dezembro de 2025. O índice serve apenas para ajustar geograficamente a referência do cargo.</div>
+        </div>
+      </div>`;
+  }
+
+  d.salario = s;
+  const ufData = s.porUF[selecionada] || s.porUF.SP;
+  return `
+    <div class="salary-panel is-hidden" id="salary-panel-wrap">
+      <div class="salary-card">
+        <div class="salary-head">
+          <div class="salary-title-wrap">
+            <div class="salary-title">💰 Pesquisa Salarial por Estado</div>
+            <div class="salary-subtitle">Referência mensal de salário-base. Clique em uma UF no mapa para comparar a estimativa regional.</div>
+          </div>
+          <span class="salary-badge">${s.origem === 'benchmark_publico' ? 'Benchmark público' : 'Estimativa IA'}</span>
+        </div>
+
+        <div class="salary-actions">
+          <button id="btn-calc-salary" class="salary-btn primary" type="button" onclick="calcularPesquisaSalarial()">↻ Atualizar estimativa</button>
+        </div>
+
+        ${s.desatualizada ? '<div class="salary-stale">⚠ A descrição do cargo foi alterada depois desta pesquisa salarial. Atualize a estimativa ou aplique uma nova média Brasil.</div>' : ''}
+
+        <div class="salary-summary">
+          <div class="salary-stat">
+            <span class="salary-stat-label">Média Brasil</span>
+            <div class="salary-stat-value">${moedaBR(s.mediaBrasil)}</div>
+            <div class="salary-stat-note">${s.origem === 'benchmark_publico'
+              ? `${esc(s.benchmark?.cargoReferencia || 'Benchmark público')} • ${esc(s.benchmark?.fonte || '')}`
+              : (s.faixaCoerencia?.nivel ? `${esc(s.faixaCoerencia.nivel)} • ${esc(s.faixaCoerencia.trilha)}` : 'Estimativa do modelo')}</div>
+          </div>
+          <div class="salary-stat">
+            <span class="salary-stat-label">Faixa Brasil</span>
+            <div class="salary-stat-value" style="font-size:13px">${moedaBR(s.p25Brasil)} – ${moedaBR(s.p75Brasil)}</div>
+            <div class="salary-stat-note">Faixa indicativa, não piso/teto oficial</div>
+          </div>
+          <div class="salary-stat">
+            <span class="salary-stat-label">${esc(UF_NOMES[selecionada])}</span>
+            <div class="salary-stat-value">${moedaBR(ufData?.media)}</div>
+            <div class="salary-stat-note">Média regional estimada</div>
+          </div>
+        </div>
+
+        <div class="salary-content">
+          <div class="salary-map-wrap"><div id="salary-map" class="salary-map"></div></div>
+          <div class="salary-state-side">
+            <select id="salary-state-select" class="salary-state-select" onchange="selecionarUFSalario(this.value)">
+              ${opcoesUFHtml(selecionada)}
+            </select>
+            <div id="salary-state-detail-wrap">${htmlDetalheSalarioUF(s, selecionada)}</div>
+          </div>
+        </div>
+
+        <div class="salary-source">
+          ${s.origem === 'benchmark_publico'
+            ? `<strong>Como interpretar:</strong> este cargo foi reconhecido em um benchmark público específico (${esc(s.benchmark?.fonte || 'fonte pública')}). A média nacional e UFs com benchmark direto usam essa referência; os demais estados continuam estimados por ajuste geográfico.`
+            : `<strong>Como interpretar:</strong> a média do cargo é uma estimativa conservadora, gerada pela IA e calibrada pela trilha/senioridade reconhecida no título.
+               Enquanto a descrição não mudar, o sistema reutiliza a mesma pesquisa salarial para evitar variações entre cálculos idênticos.
+               ${s.faixaCoerencia ? `Faixa de coerência usada para a média nacional: <strong>${moedaBR(s.faixaCoerencia.minMedia)} a ${moedaBR(s.faixaCoerencia.maxMedia)}</strong>.` : ''}
+               ${s.calibracao?.foiAjustada ? ` A estimativa bruta da IA foi ajustada de ${moedaBR(s.calibracao.mediaOriginalIA)} para ${moedaBR(s.calibracao.mediaAjustada)} por ultrapassar essa faixa.` : ''}
+               Os valores estaduais são ajustados pelo índice relativo dos salários médios gerais de admissão de cada UF no Novo CAGED (jan–dez/2025).
+               Portanto, <strong>não são médias oficiais CAGED específicas deste cargo por estado</strong>.`}
+          ${s.atualizadoEm ? ` Análise atualizada em ${new Date(s.atualizadoEm).toLocaleDateString('pt-BR')}.` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+async function calcularPesquisaSalarial() {
+  if (!descricaoAtual) return;
+
+  // O usuário iniciou o cálculo dentro deste painel; mantenha-o aberto
+  // durante e depois da atualização do documento.
+  estadoPaineisAnalise.salario = true;
+
+  const dAtual = modoEdicao ? coletarDescricaoDoEditor() : JSON.parse(JSON.stringify(descricaoAtual));
+  const assinaturaAtual = assinaturaPesquisaSalarial(dAtual);
+
+  // Primeiro tenta um benchmark público específico para o cargo.
+  // Quando há correspondência, ele tem prioridade sobre a estimativa da IA.
+  const benchmarkPublico = buscarBenchmarkSalarialPublico(dAtual);
+  if (benchmarkPublico) {
+    const salarioBenchmark = salarioPorBenchmarkPublico(benchmarkPublico, dAtual);
+    salarioBenchmark.ufSelecionada = descricaoAtual?.salario?.ufSelecionada || ufSalarioSelecionada || 'SP';
+
+    dAtual.salario = salarioBenchmark;
+    descricaoAtual = dAtual;
+    persistirPesquisaSalarialSemAlterarData();
+
+    setStatus(`✓ Benchmark público aplicado: ${benchmarkPublico.cargoReferencia} — média Brasil ${moedaBR(salarioBenchmark.mediaBrasil)}.`);
+    renderDoc(descricaoAtual, modoEdicao);
+    return;
+  }
+
+  // Se absolutamente nada relevante mudou, reutiliza a pesquisa salva.
+  // Assim, clicar novamente não muda o valor "por sorte" da IA.
+  if (
+    descricaoAtual?.salario &&
+    descricaoAtual.salario.assinatura === assinaturaAtual &&
+    !descricaoAtual.salario.desatualizada
+  ) {
+    setStatus(`✓ Pesquisa salarial já está atualizada para esta descrição: média Brasil ${moedaBR(descricaoAtual.salario.mediaBrasil)}.`);
+    aplicarEstadoPaineisAnalise();
+    return;
+  }
+
+  const chave = getChave();
+  if (!chave) {
+    setStatus('<span class="err">⚠ Para gerar a estimativa salarial automaticamente, salve uma chave Groq. Você também pode informar manualmente a Média Brasil no painel salarial.</span>');
+    return;
+  }
+
+  const d = dAtual;
+  const btn = document.getElementById('btn-calc-salary');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Calculando...';
+  }
+  setStatus('<span class="spinner"></span> Estimando referência salarial nacional...');
+
+  const schema = {
+    type: 'object',
+    properties: {
+      media_brasil: { type: 'number' },
+      p25_brasil: { type: 'number' },
+      p75_brasil: { type: 'number' },
+      justificativa: { type: 'string' }
+    },
+    required: ['media_brasil','p25_brasil','p75_brasil','justificativa'],
+    additionalProperties: false
+  };
+
+  const ano = new Date().getFullYear();
+  const faixaCoerencia = obterFaixaCoerenciaSalarial(d);
+  const prompt = `Atue como analista de remuneração no mercado brasileiro.
+
+Estime uma referência de SALÁRIO-BASE MENSAL CLT no Brasil para o cargo abaixo, em reais, sem benefícios, bônus, PLR, ações ou encargos.
+
+Ano de referência solicitado: ${ano}.
+
+OBJETIVO DA ESTIMATIVA:
+- representar a MEDIANA / centro do mercado geral brasileiro;
+- preferir uma leitura CONSERVADORA quando houver dúvida;
+- não usar remuneração de empresas premium, multinacionais de alta remuneração ou big tech como se fosse a média do mercado;
+- não transformar complexidade técnica em nível hierárquico;
+- separar claramente carreira profissional, especialista, gestão e executiva.
+
+CLASSIFICAÇÃO JÁ IDENTIFICADA PELO SISTEMA:
+- Trilha: ${faixaCoerencia.trilha}
+- Nível: ${faixaCoerencia.nivel}
+- Faixa de coerência para a MÉDIA nacional: R$ ${faixaCoerencia.minMedia} a R$ ${faixaCoerencia.maxMedia}
+- Referência central inicial: R$ ${faixaCoerencia.refMedia}
+
+REGRAS IMPORTANTES:
+- JR/Júnior, PL/Pleno e SR/Sênior são senioridades dentro da trilha profissional quando o cargo for Analista.
+- "Analista SR" continua sendo individual contributor / profissional Sênior, e NÃO deve receber faixa de Gerente apenas por ter autonomia, influência ou complexidade elevadas.
+- Só use faixa gerencial se o título e a descrição realmente indicarem gestão formal de equipe/estrutura.
+- Complexidade 4 ou 5 não autoriza, por si só, remuneração gerencial.
+- Escolha a média DENTRO da faixa de coerência indicada acima.
+- Use a parte superior da faixa apenas em casos claramente acima da média do mercado.
+- Para Analista Júnior, não escolha automaticamente R$ 5 mil ou mais; isso deve ser exceção, não referência central.
+- Para Analista Pleno e Sênior, mantenha coerência com carreira profissional, sem aproximar automaticamente de faixas gerenciais.
+- Não apresente os números como dados oficiais do CAGED, Glassdoor, Mercer ou outra pesquisa proprietária.
+
+Cargo: ${d.cargo || ''}
+Área: ${d.departamento || ''}
+Complexidade calculada: ${d.complexidade?.nivel || ''}
+Objetivo: ${d.objetivo || ''}
+Responsabilidades: ${(d.responsabilidades || []).join(' | ')}
+Formação: ${d.formacao || ''}
+Experiência: ${d.experiencia || ''}
+Conhecimentos: ${d.conhecimentos || ''}
+
+Retorne:
+- media_brasil: estimativa da média mensal nacional;
+- p25_brasil: referência inferior plausível;
+- p75_brasil: referência superior plausível;
+- justificativa: no máximo duas frases sobre os principais fatores considerados.
+
+Todos os valores devem ser números positivos em reais.`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${chave}`
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-oss-120b',
+        temperature: 0.15,
+        max_completion_tokens: 900,
+        reasoning_effort: 'low',
+        reasoning_format: 'hidden',
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name:'pesquisa_salarial', strict:true, schema }
+        },
+        messages: [{ role:'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || `Erro HTTP ${res.status}`);
+    const conteudo = data?.choices?.[0]?.message?.content;
+    if (!conteudo) throw new Error('A Groq respondeu sem dados salariais.');
+
+    const r = JSON.parse(conteudo.replace(/```json|```/g, '').trim());
+    if (!Number(r.media_brasil)) throw new Error('Média salarial inválida.');
+
+    const calibrada = calibrarPesquisaSalarialIA(r, d);
+    const salario = normalizarPesquisaSalarial({
+      ...calibrada,
+      assinatura: assinaturaAtual,
+      ufSelecionada: descricaoAtual?.salario?.ufSelecionada || ufSalarioSelecionada || 'SP'
+    });
+
+    d.salario = salario;
+    descricaoAtual = d;
+    persistirPesquisaSalarialSemAlterarData();
+    setStatus(`✓ Pesquisa salarial estimada: média Brasil ${moedaBR(salario.mediaBrasil)}.`);
+    renderDoc(descricaoAtual, modoEdicao);
+  } catch(e) {
+    console.error(e);
+    setStatus('<span class="err">⚠ Não foi possível calcular a estimativa salarial: ' + esc(e.message) + '</span>');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Calcular estimativa salarial';
+    }
+  }
+}
+
+</script>
+<script>
+/* js/paineis.js */
+function toggleGrading() {
+  const painel = document.getElementById('grading-panel');
+  const btn = document.getElementById('btn-grading-toggle');
+  if (!painel || !btn) return;
+
+  const abrindo = painel.classList.contains('is-hidden');
+  estadoPaineisAnalise.grading = abrindo;
+  aplicarEstadoPaineisAnalise();
+}
+
+function toggleComplexidade() {
+  const painel = document.getElementById('complexity-panel-wrap');
+  const btn = document.getElementById('btn-complexity-toggle');
+  if (!painel || !btn) return;
+
+  const abrindo = painel.classList.contains('is-hidden');
+  estadoPaineisAnalise.complexidade = abrindo;
+  aplicarEstadoPaineisAnalise();
+}
+
+function toggleSalario() {
+  const painel = document.getElementById('salary-panel-wrap');
+  const btn = document.getElementById('btn-salary-toggle');
+  if (!painel || !btn) return;
+
+  const abrindo = painel.classList.contains('is-hidden');
+  estadoPaineisAnalise.salario = abrindo;
+  aplicarEstadoPaineisAnalise();
+}
+
+function aplicarEstadoPaineisAnalise() {
+  const complexidade = document.getElementById('complexity-panel-wrap');
+  const salario = document.getElementById('salary-panel-wrap');
+  const grading = document.getElementById('grading-panel');
+
+  const btnComplexidade = document.getElementById('btn-complexity-toggle');
+  const btnSalario = document.getElementById('btn-salary-toggle');
+  const btnGrading = document.getElementById('btn-grading-toggle');
+
+  if (complexidade) {
+    complexidade.classList.toggle('is-hidden', !estadoPaineisAnalise.complexidade);
+  }
+  if (btnComplexidade) {
+    btnComplexidade.classList.toggle('is-open', estadoPaineisAnalise.complexidade);
+    btnComplexidade.innerHTML = estadoPaineisAnalise.complexidade
+      ? '🧠 Ocultar Complexidade'
+      : '🧠 Mostrar Complexidade do Cargo';
+  }
+
+  if (salario) {
+    salario.classList.toggle('is-hidden', !estadoPaineisAnalise.salario);
+  }
+  if (btnSalario) {
+    btnSalario.classList.toggle('is-open', estadoPaineisAnalise.salario);
+    btnSalario.innerHTML = estadoPaineisAnalise.salario
+      ? '💰 Ocultar Pesquisa Salarial'
+      : '💰 Mostrar Pesquisa Salarial';
+  }
+
+  if (grading) {
+    grading.classList.toggle('is-hidden', !estadoPaineisAnalise.grading);
+  }
+  if (btnGrading) {
+    btnGrading.classList.toggle('is-open', estadoPaineisAnalise.grading);
+    btnGrading.innerHTML = estadoPaineisAnalise.grading
+      ? '📊 Ocultar Grading'
+      : '📊 Mostrar Grading Korn Ferry / Mercer';
+  }
+
+  // Só desenha/recalcula o mapa quando a seção salarial está realmente visível.
+  if (
+    estadoPaineisAnalise.salario &&
+    descricaoAtual?.salario?.porUF &&
+    salario &&
+    !salario.classList.contains('is-hidden')
+  ) {
+    setTimeout(() => renderMapaSalarios(descricaoAtual.salario), 120);
+  }
+}
+
+
+</script>
+<script>
+/* js/edicao.js */
+function editarDescricao() {
+  if (!descricaoAtual) return;
+  if (!modoEdicao) descricaoAntesDaEdicao = JSON.parse(JSON.stringify(descricaoAtual));
+  modoEdicao = true;
+  renderDoc(descricaoAtual, true);
+  setStatus('Modo de edição ativo. Altere, inclua ou remova informações e clique em Salvar alterações.');
+}
+
+function cancelarEdicao() {
+  if (descricaoAntesDaEdicao) descricaoAtual = descricaoAntesDaEdicao;
+  descricaoAntesDaEdicao = null;
+  modoEdicao = false;
+  renderDoc(descricaoAtual, false);
+  setStatus('Edição cancelada. Nenhuma alteração foi salva.');
+}
+
+function adicionarResponsabilidade() {
+  if (!modoEdicao) return;
+  const d = coletarDescricaoDoEditor();
+  d.responsabilidades.push('');
+  descricaoAtual = d;
+  renderDoc(descricaoAtual, true);
+  const campos = document.querySelectorAll('.resp-edit-input');
+  campos[campos.length - 1]?.focus();
+}
+
+function removerResponsabilidade(indice) {
+  if (!modoEdicao) return;
+  const d = coletarDescricaoDoEditor();
+  d.responsabilidades.splice(indice, 1);
+  descricaoAtual = d;
+  renderDoc(descricaoAtual, true);
+}
+
+async function salvarDescricaoAtual() {
+  if (!descricaoAtual) return;
+  const estavaEditando = modoEdicao;
+  const d = modoEdicao ? coletarDescricaoDoEditor() : JSON.parse(JSON.stringify(descricaoAtual));
+  if (!d.cargo) {
+    setStatus('<span class="err">⚠ O campo Cargo não pode ficar vazio.</span>');
+    return;
+  }
+
+  if (estavaEditando) {
+    setStatus('<span class="spinner"></span> Recalculando complexidade após as alterações...');
+    d.complexidade = await recalcularComplexidadeComIA(d, true);
+    if (d.salario) {
+      d.salario.desatualizada = true;
+      d.salario.assinatura = null;
+    }
+  } else if (!d.complexidade) {
+    d.complexidade = await recalcularComplexidadeComIA(d, true);
+  }
+
+  if (!cargoConsultaAtual) cargoConsultaAtual = document.getElementById('cargo-input').value.trim() || d.cargo;
+  if (salvarDescricaoLocal(d, cargoConsultaAtual)) {
+    descricaoAntesDaEdicao = null;
+    descricaoAtual = d;
+    modoEdicao = false;
+    document.getElementById('cargo-input').value = cargoConsultaAtual;
+    setStatus(estavaEditando
+      ? '✓ Alterações salvas e complexidade recalculada com base na nova descrição.'
+      : '✓ Descrição salva. Ao gerar este mesmo cargo novamente nesta empresa, esta versão será carregada.');
+    renderDoc(descricaoAtual, false);
+  }
+}
+
+function gerarNovamenteComIA() {
+  modoEdicao = false;
+  gerar(true);
+}
+
+</script>
+<script>
+/* js/geracao.js */
+/* ─── GERAR ──────────────────────────────────────────────────────────── */
+async function gerar(forcarIA = false) {
+  const nome = document.getElementById('cargo-input').value.trim();
+  if (!nome) { setStatus('<span class="err">⚠ Informe o nome do cargo.</span>'); return; }
+
+  if (!forcarIA) {
+    const salva = buscarDescricaoSalva(nome);
+    if (salva) {
+      cargoConsultaAtual = nome;
+      descricaoAtual = salva;
+      modoEdicao = false;
+
+      estadoPaineisAnalise.complexidade = false;
+      estadoPaineisAnalise.salario = false;
+      estadoPaineisAnalise.grading = false;
+
+      if (descricaoAtual?.complexidade?.versao !== 3) {
+        setStatus('<span class="spinner"></span> Atualizando a análise de complexidade do cargo salvo...');
+        descricaoAtual.complexidade = await recalcularComplexidadeComIA(descricaoAtual, true);
+      }
+
+      setStatus('✓ Descrição salva carregada para ' + esc(empresaAtual.nome) + '.');
+      renderDoc(descricaoAtual, false);
+      return;
+    }
+  }
+
+  const chave = getChave();
+  if (!chave) {
+    setStatus('<span class="err">⚠ Não há descrição salva para este cargo. Cole sua chave Groq no campo superior direito e clique em Usar chave.</span>');
+    return;
+  }
+
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+  setStatus('<div class="spinner"></div> Gerando descrição com IA...');
+  document.getElementById('doc-wrap').innerHTML = '';
+
+  const contextoUsuario = contextoAdicional
+    ? `\n- Contexto adicional fornecido para esta vaga: ${contextoAdicional}`
+    : '\n- Contexto adicional fornecido para esta vaga: nenhum';
+
+  const promptDescricao = `Você é especialista em Gestão de Pessoas, Cargos & Salários e metodologias de grading de mercado (Korn Ferry e Mercer).
+
+Gere uma descrição de cargo completa, realista e profissional para:
+- Cargo: "${nome}"
+- Contexto: descrição profissional genérica, sem citar ou presumir uma organização específica.${contextoUsuario}
+
+Regras:
+- O nome do cargo deve ser preservado EXATAMENTE como foi digitado pelo usuário.
+- NÃO acrescente, remova ou altere senioridade no nome do cargo.
+- Se o usuário digitou "Motorista", o campo cargo deve ser exatamente "Motorista", nunca "Motorista Júnior", "Motorista Pleno" ou "Motorista Sênior".
+- Se o usuário digitou "Analista de RH Pleno", mantenha exatamente "Analista de RH Pleno".
+- A senioridade deve ser interpretada para definir o ESCOPO da descrição, sem alterar o título do cargo.
+- Interprete JR/Júnior como Júnior, PL/Pleno como Pleno e SR/Sênior/Senior como Sênior.
+- Se o cargo vier com SR/Sênior, a descrição deve refletir maior autonomia técnica, profundidade de conhecimento, tratamento de problemas mais complexos e influência/mentoria quando pertinente à função.
+- Se vier com PL/Pleno, reflita autonomia e domínio intermediários/consolidados; se vier com JR/Júnior, reflita escopo de desenvolvimento e maior orientação.
+- O segmento da empresa é contexto de apoio — use apenas quando relevante ao escopo do cargo.
+- Não atribua atividades operacionais da empresa a cargos corporativos (RH, Financeiro, Jurídico, TI etc.).
+- KORN FERRY: use como referência conceitual o Hay Guide Chart–Profile Method. Analise Know-How, Problem Solving e Accountability. NÃO invente pontos Hay, grade numérico oficial ou resultado licenciado. O campo nivel deve ser apenas uma estimativa descritiva de porte relativo do trabalho.
+- MERCER: use como referência conceitual o International Position Evaluation (IPE), considerando Impacto, Comunicação, Inovação, Conhecimento e Risco/Esforço. A classificação exata depende também do contexto e dimensionamento da organização; portanto, não apresente uma classe IPE oficial. Se usar P/M/S/E, trate como estimativa do Career Framework, distinta da pontuação IPE.
+- Todos os resultados de Korn Ferry e Mercer são referências orientativas geradas a partir da descrição, não avaliações oficiais das consultorias.
+- Para complexidade, use a escala interna de 1 a 5 descrita no schema: Rotineira, Básica, Intermediária, Avançada e Estratégica.
+
+Responda APENAS em JSON válido, sem markdown, sem texto antes ou depois:
+{
+  "cargo": "copie EXATAMENTE o nome do cargo informado pelo usuário, sem acrescentar ou remover nível/senioridade",
+  "departamento": "nome do departamento/área",
+  "objetivo": "parágrafo único descrevendo o objetivo principal do cargo",
+  "responsabilidades": ["item 1","item 2","item 3","item 4","item 5","item 6","item 7","item 8"],
+  "formacao": "formação acadêmica mínima exigida",
+  "experiencia": "tempo e tipo de experiência profissional exigida",
+  "conhecimentos": "conhecimentos técnicos, ferramentas e habilidades necessárias",
+  "grading": {
+    "korn_ferry": {
+      "familia": "família funcional estimada",
+      "carreira": "trilha estimada do trabalho",
+      "nivel": "porte relativo estimado em texto, sem número/grade oficial",
+      "fatores": {
+        "know_how": "Baixo, Moderado, Alto ou Muito alto + breve explicação",
+        "problem_solving": "Baixo, Moderado, Alto ou Muito alto + breve explicação",
+        "accountability": "Baixa, Moderada, Alta ou Muito alta + breve explicação"
+      },
+      "justificativa": "frase curta explicando a estimativa pela lógica Hay"
+    },
+    "mercer": {
+      "familia": "família funcional estimada",
+      "subfamilia": "subfamília ou especialidade estimada",
+      "nivel": "trilha/nível de carreira estimado, deixando claro que não é classe IPE oficial",
+      "fatores": {
+        "impacto": "Baixo, Moderado, Alto ou Muito alto + breve explicação",
+        "comunicacao": "Baixa, Moderada, Alta ou Muito alta + breve explicação",
+        "inovacao": "Baixa, Moderada, Alta ou Muito alta + breve explicação",
+        "conhecimento": "Baixo, Moderado, Alto ou Muito alto + breve explicação",
+        "risco_esforco": "Baixo, Moderado, Alto ou Muito alto + breve explicação"
+      },
+      "justificativa": "frase curta explicando a estimativa pela lógica IPE"
+    }
+  },
+  "complexidade": {
+    "pontuacao": 3,
+    "nivel": "3 — Intermediária",
+    "fatores": {
+      "autonomia": "descrição curta",
+      "impacto": "descrição curta",
+      "problemas": "descrição curta",
+      "conhecimento": "descrição curta",
+      "lideranca": "descrição curta"
+    },
+    "justificativa": "até duas frases justificando o nível com base na descrição"
+  }
+}`;
+
+  const SCHEMA_VALIDACAO_CARGO = {
+    type: 'object',
+    properties: {
+      valido: { type: 'boolean' },
+      motivo: { type: 'string' }
+    },
+    required: ['valido', 'motivo'],
+    additionalProperties: false
+  };
+
+  const SCHEMA_DESCRICAO_CARGO = {
+    type: 'object',
+    properties: {
+      cargo: { type: 'string' },
+      departamento: { type: 'string' },
+      objetivo: { type: 'string' },
+      responsabilidades: {
+        type: 'array',
+        items: { type: 'string' }
+      },
+      formacao: { type: 'string' },
+      experiencia: { type: 'string' },
+      conhecimentos: { type: 'string' },
+      grading: {
+        type: 'object',
+        properties: {
+          korn_ferry: {
+            type: 'object',
+            properties: {
+              familia: { type: 'string' },
+              carreira: { type: 'string' },
+              nivel: { type: 'string' },
+              fatores: {
+                type: 'object',
+                properties: {
+                  know_how: { type: 'string' },
+                  problem_solving: { type: 'string' },
+                  accountability: { type: 'string' }
+                },
+                required: ['know_how','problem_solving','accountability'],
+                additionalProperties: false
+              },
+              justificativa: { type: 'string' }
+            },
+            required: ['familia', 'carreira', 'nivel', 'fatores', 'justificativa'],
+            additionalProperties: false
+          },
+          mercer: {
+            type: 'object',
+            properties: {
+              familia: { type: 'string' },
+              subfamilia: { type: 'string' },
+              nivel: { type: 'string' },
+              fatores: {
+                type: 'object',
+                properties: {
+                  impacto: { type: 'string' },
+                  comunicacao: { type: 'string' },
+                  inovacao: { type: 'string' },
+                  conhecimento: { type: 'string' },
+                  risco_esforco: { type: 'string' }
+                },
+                required: ['impacto','comunicacao','inovacao','conhecimento','risco_esforco'],
+                additionalProperties: false
+              },
+              justificativa: { type: 'string' }
+            },
+            required: ['familia', 'subfamilia', 'nivel', 'fatores', 'justificativa'],
+            additionalProperties: false
+          }
+        },
+        required: ['korn_ferry', 'mercer'],
+        additionalProperties: false
+      },
+      complexidade: {
+        type: 'object',
+        properties: {
+          pontuacao: { type: 'integer', minimum: 1, maximum: 5 },
+          nivel: { type: 'string' },
+          fatores: {
+            type: 'object',
+            properties: {
+              autonomia: { type: 'string' },
+              impacto: { type: 'string' },
+              problemas: { type: 'string' },
+              conhecimento: { type: 'string' },
+              lideranca: { type: 'string' }
+            },
+            required: ['autonomia','impacto','problemas','conhecimento','lideranca'],
+            additionalProperties: false
+          },
+          justificativa: { type: 'string' }
+        },
+        required: ['pontuacao','nivel','fatores','justificativa'],
+        additionalProperties: false
+      }
+    },
+    required: [
+      'cargo',
+      'departamento',
+      'objetivo',
+      'responsabilidades',
+      'formacao',
+      'experiencia',
+      'conhecimentos',
+      'grading',
+      'complexidade'
+    ],
+    additionalProperties: false
+  };
+
+  async function chamarGroq(promptTexto, maxTok, nomeSchema, schema) {
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${chave}`
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-120b',
+          temperature: 0.2,
+          max_completion_tokens: maxTok,
+          reasoning_effort: 'low',
+          reasoning_format: 'hidden',
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: nomeSchema,
+              strict: true,
+              schema
+            }
+          },
+          messages: [
+            {
+              role: 'user',
+              content: promptTexto
+            }
+          ]
+        })
+      });
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(
+          `A Groq respondeu com HTTP ${res.status}, mas sem JSON válido.`
+        );
+      }
+
+      if (!res.ok) {
+        const mensagemApi =
+          data?.error?.message ||
+          `Erro HTTP ${res.status} na API Groq`;
+
+        if (res.status === 400) {
+          const detalhe =
+            data?.error?.failed_generation
+              ? ` Detalhe: ${
+                  typeof data.error.failed_generation === 'string'
+                    ? data.error.failed_generation
+                    : JSON.stringify(data.error.failed_generation)
+                }`
+              : '';
+
+          throw new Error(
+            `A Groq recusou a estrutura da requisição.${detalhe || ` ${mensagemApi}`}`
+          );
+        }
+
+        if (res.status === 401) {
+          throw new Error(
+            'Chave Groq inválida, expirada ou não autorizada.'
+          );
+        }
+
+        if (res.status === 403) {
+          throw new Error(
+            `Acesso negado pela Groq. Verifique as permissões do projeto/modelo. Detalhe: ${mensagemApi}`
+          );
+        }
+
+        if (res.status === 429) {
+          throw new Error(
+            `Limite de uso da Groq atingido. Aguarde a liberação da cota. Detalhe: ${mensagemApi}`
+          );
+        }
+
+        throw new Error(mensagemApi);
+      }
+
+      const conteudo = data?.choices?.[0]?.message?.content;
+
+      if (!conteudo) {
+        throw new Error(
+          'A Groq respondeu sem conteúdo utilizável.'
+        );
+      }
+
+      return conteudo;
+    } catch (erro) {
+      if (erro instanceof TypeError) {
+        throw new Error(
+          'Não foi possível conectar à API Groq. Verifique sua internet, bloqueios do navegador ou CORS.'
+        );
+      }
+
+      throw erro;
+    }
+  }
+
+  try {
+    // ── ETAPA 1: validar se o cargo é real e reconhecido no mercado de trabalho ──
+    setStatus('<span class="spinner"></span> Validando cargo...');
+    const promptValidacao = `Você é especialista em Recursos Humanos e mercado de trabalho.
+
+O usuário digitou: "${nome}"
+
+Avalie se isso é um cargo ou função profissional legítima e reconhecida no mercado de trabalho formal brasileiro (CLT, PJ ou estatutário). Considere cargos de qualquer setor, nível hierárquico ou área.
+
+Preencha exatamente os campos definidos no schema:
+- valido: true quando for um cargo/função profissional legítima; false caso contrário.
+- motivo: deixe uma string vazia quando valido for true; quando for false, explique brevemente o motivo em português.
+
+Exemplos de INVÁLIDO: nomes de animais, palavras ofensivas, atividades ilegais, nomes próprios de pessoas, termos sem sentido, profissões fictícias.
+Exemplos de VÁLIDO: Analista de RH, Motorista, Auxiliar de Limpeza, CEO, Engenheiro Civil, Assistente Jurídico.`;
+
+    const resVal = await chamarGroq(promptValidacao, 500, 'validacao_cargo', SCHEMA_VALIDACAO_CARGO);
+    const cleanVal = resVal.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    const val = JSON.parse(cleanVal);
+
+    if (!val.valido) {
+      setStatus('<span class="err">⚠ Cargo inválido: ' + esc(val.motivo || 'não reconhecido como cargo profissional.') + '</span>');
+      btn.disabled = false;
+      return;
+    }
+
+    // ── ETAPA 2: gerar descrição completa ────────────────────────────────────
+    setStatus('<span class="spinner"></span> Gerando descrição com IA...');
+    const raw = await chamarGroq(promptDescricao, 3500, 'descricao_cargo', SCHEMA_DESCRICAO_CARGO);
+    const clean = raw.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    const d = JSON.parse(clean);
+
+    // O título exibido e salvo deve ser exatamente o que o usuário digitou.
+    // A IA pode avaliar senioridade no grading, mas nunca alterar o nome do cargo.
+    d.cargo = nome;
+
+    // A complexidade só é fechada DEPOIS que a nova descrição está completa.
+    // Isso garante que o painel inferior sempre corresponda ao cargo recém-gerado
+    // e elimina o reaproveitamento visual/lógico do cargo anterior.
+    setStatus('<span class="spinner"></span> Descrição pronta. Calculando a complexidade do novo cargo...');
+    d.complexidade = await recalcularComplexidadeComIA(d, true);
+
+    cargoConsultaAtual = nome;
+    descricaoAtual = d;
+    modoEdicao = false;
+
+    // Novo cargo começa com as análises recolhidas.
+    estadoPaineisAnalise.complexidade = false;
+    estadoPaineisAnalise.salario = false;
+    estadoPaineisAnalise.grading = false;
+
+    setStatus(`✓ Descrição gerada. Complexidade: ${esc(d.complexidade?.nivel || 'calculada')}. Você pode editar e salvar esta versão como padrão.`);
+    renderDoc(descricaoAtual, false);
+  } catch(e) {
+    setStatus('<span class="err">⚠ Erro: ' + esc(e.message) + '</span>');
+    document.getElementById('doc-wrap').innerHTML = '';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+
+</script>
+<script>
+/* js/documento.js */
+/* ─── RENDER DOC ─────────────────────────────────────────────────────── */
+function renderDoc(d, editar = false) {
+  if (!d) return;
+  descricaoAtual = d;
+  modoEdicao = editar;
+
+  const cor = empresaAtual.cor;
+  const g = d.grading || {};
+  const kf = g.korn_ferry || {};
+  const mc = g.mercer || {};
+  const kff = kf.fatores || {};
+  const mcf = mc.fatores || {};
+  const cx = d.complexidade || {};
+  const cxf = cx.fatores || {};
+  const cxScore = normalizarPontuacaoComplexidade(cx.pontuacao || 1);
+  const cxAutonomia = obterFatorComplexidade(cx, 'autonomia');
+  const cxImpacto = obterFatorComplexidade(cx, 'impacto');
+  const cxProblemas = obterFatorComplexidade(cx, 'problemas');
+  const cxConhecimento = obterFatorComplexidade(cx, 'conhecimento');
+  const cxLideranca = obterFatorComplexidade(cx, 'lideranca');
+  const responsabilidades = Array.isArray(d.responsabilidades)
+    ? d.responsabilidades
+    : (d.responsabilidades ? [d.responsabilidades] : []);
+  const salvo = existeDescricaoSalva(cargoConsultaAtual || d.cargo);
+  const docLogoHtml = renderMarca(empresaAtual, 'doc');
+
+  const identificacaoHtml = editar ? `
+      <div class="row-lbl">
+        <div class="cell-l">CARGO:</div>
+        <div class="cell-v"><input id="edit-cargo" class="edit-input" value="${escAttr(d.cargo || '')}"></div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">ÁREA / DEPARTAMENTO:</div>
+        <div class="cell-v"><input id="edit-departamento" class="edit-input" value="${escAttr(d.departamento || '')}"></div>
+      </div>` : `
+      <div class="row-lbl">
+        <div class="cell-l">CARGO:</div>
+        <div class="cell-v" style="font-weight:600">${esc(d.cargo)}</div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">ÁREA / DEPARTAMENTO:</div>
+        <div class="cell-v">${esc(d.departamento)}</div>
+      </div>`;
+
+  const objetivoHtml = editar
+    ? `<div class="block-val"><textarea id="edit-objetivo" class="edit-textarea edit-textarea--large">${esc(d.objetivo || '')}</textarea></div>`
+    : `<div class="block-val">${esc(d.objetivo)}</div>`;
+
+  const responsabilidadesHtml = editar ? `
+      <div class="resp-edit-list">
+        ${responsabilidades.map((r, i) => `
+          <div class="resp-edit-item">
+            <div class="resp-edit-num">${i + 1}.</div>
+            <textarea class="edit-textarea resp-edit-input" rows="2">${esc(r)}</textarea>
+            <button type="button" class="btn-remove-resp" onclick="removerResponsabilidade(${i})" title="Remover responsabilidade">×</button>
+          </div>`).join('')}
+        <button type="button" class="btn-add-resp" onclick="adicionarResponsabilidade()">＋ Adicionar responsabilidade</button>
+      </div>`
+    : `<ul class="resp-list">${responsabilidades.map(r => `<li>${esc(r)}</li>`).join('')}</ul>`;
+
+  const requisitosHtml = editar ? `
+      <div class="row-lbl">
+        <div class="cell-l">FORMAÇÃO:</div>
+        <div class="cell-v"><textarea id="edit-formacao" class="edit-textarea">${esc(d.formacao || '')}</textarea></div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">EXPERIÊNCIA:</div>
+        <div class="cell-v"><textarea id="edit-experiencia" class="edit-textarea">${esc(d.experiencia || '')}</textarea></div>
+      </div>
+      <div class="row-lbl" style="border-bottom:none">
+        <div class="cell-l">CONHECIMENTOS<br>ESPECÍFICOS/<br>HABILIDADES:</div>
+        <div class="cell-v"><textarea id="edit-conhecimentos" class="edit-textarea edit-textarea--large">${esc(d.conhecimentos || '')}</textarea></div>
+      </div>` : `
+      <div class="row-lbl">
+        <div class="cell-l">FORMAÇÃO:</div>
+        <div class="cell-v">${esc(d.formacao)}</div>
+      </div>
+      <div class="row-lbl">
+        <div class="cell-l">EXPERIÊNCIA:</div>
+        <div class="cell-v">${esc(d.experiencia)}</div>
+      </div>
+      <div class="row-lbl" style="border-bottom:none">
+        <div class="cell-l">CONHECIMENTOS<br>ESPECÍFICOS/<br>HABILIDADES:</div>
+        <div class="cell-v">${esc(d.conhecimentos)}</div>
+      </div>`;
+
+  const gradingKfHtml = editar ? `
+            <div class="grading-method-note"><strong>Hay Guide Chart–Profile:</strong> leitura conceitual por Know-How, Problem Solving e Accountability. O resultado é orientativo e não representa grade oficial/licenciado Korn Ferry.</div>
+            <div class="grading-row-info"><span class="gi-label">Família</span><span class="gi-value" style="flex:1"><input id="edit-kf-familia" class="edit-input" value="${escAttr(kf.familia || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Carreira</span><span class="gi-value" style="flex:1"><input id="edit-kf-carreira" class="edit-input" value="${escAttr(kf.carreira || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Porte estim.</span><span class="gi-value" style="flex:1"><input id="edit-kf-nivel" class="edit-input" value="${escAttr(kf.nivel || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Know-How</span><span class="gi-value">${esc(kff.know_how || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Problem Solving</span><span class="gi-value">${esc(kff.problem_solving || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Accountability</span><span class="gi-value">${esc(kff.accountability || '—')}</span></div>
+            <div class="grading-row-info grading-row-just"><span class="gi-label">Justificativa</span><span class="gi-value" style="flex:1"><textarea id="edit-kf-justificativa" class="edit-textarea">${esc(kf.justificativa || '')}</textarea></span></div>` : `
+            <div class="grading-method-note"><strong>Hay Guide Chart–Profile:</strong> leitura conceitual por Know-How, Problem Solving e Accountability. Não representa grade oficial/licenciado Korn Ferry.</div>
+            <div class="grading-row-info"><span class="gi-label">Família</span><span class="gi-value">${esc(kf.familia || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Carreira</span><span class="gi-value">${esc(kf.carreira || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Porte estim.</span><span class="gi-value gi-destaque" style="color:${cor}">${esc(kf.nivel || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Know-How</span><span class="gi-value">${esc(kff.know_how || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Problem Solving</span><span class="gi-value">${esc(kff.problem_solving || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Accountability</span><span class="gi-value">${esc(kff.accountability || '—')}</span></div>
+            <div class="grading-row-info grading-row-just"><span class="gi-label">Justificativa</span><span class="gi-value gi-just">${esc(kf.justificativa || '—')}</span></div>`;
+
+  const gradingMcHtml = editar ? `
+            <div class="grading-method-note"><strong>Mercer IPE:</strong> leitura conceitual por Impacto, Comunicação, Inovação, Conhecimento e 5º fator de Risco/Esforço, conforme versão/localização. A avaliação exata depende também do dimensionamento da organização.</div>
+            <div class="grading-row-info"><span class="gi-label">Família</span><span class="gi-value" style="flex:1"><input id="edit-mc-familia" class="edit-input" value="${escAttr(mc.familia || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Subfamília</span><span class="gi-value" style="flex:1"><input id="edit-mc-subfamilia" class="edit-input" value="${escAttr(mc.subfamilia || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Carreira estim.</span><span class="gi-value" style="flex:1"><input id="edit-mc-nivel" class="edit-input" value="${escAttr(mc.nivel || '')}"></span></div>
+            <div class="grading-row-info"><span class="gi-label">Impacto</span><span class="gi-value">${esc(mcf.impacto || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Comunicação</span><span class="gi-value">${esc(mcf.comunicacao || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Inovação</span><span class="gi-value">${esc(mcf.inovacao || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Conhecimento</span><span class="gi-value">${esc(mcf.conhecimento || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Risco/Esforço</span><span class="gi-value">${esc(mcf.risco_esforco || '—')}</span></div>
+            <div class="grading-row-info grading-row-just"><span class="gi-label">Justificativa</span><span class="gi-value" style="flex:1"><textarea id="edit-mc-justificativa" class="edit-textarea">${esc(mc.justificativa || '')}</textarea></span></div>` : `
+            <div class="grading-method-note"><strong>Mercer IPE:</strong> leitura conceitual por Impacto, Comunicação, Inovação, Conhecimento e 5º fator de Risco/Esforço, conforme versão/localização. Não representa classe IPE oficial.</div>
+            <div class="grading-row-info"><span class="gi-label">Família</span><span class="gi-value">${esc(mc.familia || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Subfamília</span><span class="gi-value">${esc(mc.subfamilia || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Carreira estim.</span><span class="gi-value gi-destaque" style="color:${cor}">${esc(mc.nivel || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Impacto</span><span class="gi-value">${esc(mcf.impacto || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Comunicação</span><span class="gi-value">${esc(mcf.comunicacao || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Inovação</span><span class="gi-value">${esc(mcf.inovacao || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Conhecimento</span><span class="gi-value">${esc(mcf.conhecimento || '—')}</span></div>
+            <div class="grading-row-info"><span class="gi-label">Risco/Esforço</span><span class="gi-value">${esc(mcf.risco_esforco || '—')}</span></div>
+            <div class="grading-row-info grading-row-just"><span class="gi-label">Justificativa</span><span class="gi-value gi-just">${esc(mc.justificativa || '—')}</span></div>`;
+
+  const complexityHtml = `
+        <div class="complexity-section">
+          <div class="complexity-head">
+            <div class="complexity-title-wrap">
+              <div class="complexity-name">COMPLEXIDADE DO CARGO</div>
+              <div class="complexity-help">O sistema pontua cinco dimensões separadamente e calcula o nível final. Ao gerar, editar ou salvar, a análise é atualizada.</div>
+            </div>
+            <span class="complexity-badge" style="border-color:${cor};color:${cor}">${esc(cx.nivel || 'Não calculada')}</span>
+          </div>
+          <div class="complexity-scale">
+            ${[1,2,3,4,5].map(n => `<span class="complexity-step ${n <= cxScore && cx.pontuacao ? 'active' : ''}" ${n <= cxScore && cx.pontuacao ? `style="background:${cor}"` : ''}></span>`).join('')}
+          </div>
+          <div class="complexity-legend">
+            <div class="complexity-legend-item"><strong>1</strong>Rotineira</div>
+            <div class="complexity-legend-item"><strong>2</strong>Básica</div>
+            <div class="complexity-legend-item"><strong>3</strong>Intermediária</div>
+            <div class="complexity-legend-item"><strong>4</strong>Avançada</div>
+            <div class="complexity-legend-item"><strong>5</strong>Estratégica</div>
+          </div>
+          <div class="complexity-factors">
+            <div class="complexity-factor">
+              <span class="complexity-factor-label">Autonomia</span>
+              ${cxAutonomia.pontuacao ? `<span class="complexity-factor-score" style="color:${cor}">${cxAutonomia.pontuacao}/5</span>` : ''}
+              <span class="complexity-factor-value">${esc(cxAutonomia.descricao || '—')}</span>
+            </div>
+            <div class="complexity-factor">
+              <span class="complexity-factor-label">Impacto</span>
+              ${cxImpacto.pontuacao ? `<span class="complexity-factor-score" style="color:${cor}">${cxImpacto.pontuacao}/5</span>` : ''}
+              <span class="complexity-factor-value">${esc(cxImpacto.descricao || '—')}</span>
+            </div>
+            <div class="complexity-factor">
+              <span class="complexity-factor-label">Problemas</span>
+              ${cxProblemas.pontuacao ? `<span class="complexity-factor-score" style="color:${cor}">${cxProblemas.pontuacao}/5</span>` : ''}
+              <span class="complexity-factor-value">${esc(cxProblemas.descricao || '—')}</span>
+            </div>
+            <div class="complexity-factor">
+              <span class="complexity-factor-label">Conhecimento</span>
+              ${cxConhecimento.pontuacao ? `<span class="complexity-factor-score" style="color:${cor}">${cxConhecimento.pontuacao}/5</span>` : ''}
+              <span class="complexity-factor-value">${esc(cxConhecimento.descricao || '—')}</span>
+            </div>
+            <div class="complexity-factor">
+              <span class="complexity-factor-label">Influência / Liderança</span>
+              ${cxLideranca.pontuacao ? `<span class="complexity-factor-score" style="color:${cor}">${cxLideranca.pontuacao}/5</span>` : ''}
+              <span class="complexity-factor-value">${esc(cxLideranca.descricao || '—')}</span>
+            </div>
+          </div>
+          ${cx.indice ? `<div class="complexity-index">Índice ponderado: <strong>${Number(cx.indice).toFixed(2)}</strong> / 5,00${cx.senioridadeDetectada ? ` • Senioridade reconhecida: <strong>${cx.senioridadeDetectada === 'senior' ? 'SR / Sênior' : cx.senioridadeDetectada === 'pleno' ? 'PL / Pleno' : 'JR / Júnior'}</strong>` : ''}</div>` : ''}
+          <div class="complexity-just">${esc(cx.justificativa || 'A complexidade será calculada na próxima geração ou ao clicar em Recalcular.')}</div>
+          <div class="complexity-actions">
+            <button id="btn-recalculate-complexity" class="btn-recalculate" type="button" onclick="recalcularComplexidadeAtual()">↻ Recalcular complexidade</button>
+          </div>
+        </div>`;
+
+  const salaryHtml = htmlPesquisaSalarial(d);
+
+  const botoesHtml = editar ? `
+      <button class="btn-primary-action" style="background:${cor};border-color:${cor}" onclick="salvarDescricaoAtual()">💾 Salvar alterações</button>
+      <button class="btn-secondary" onclick="cancelarEdicao()">Cancelar</button>` : `
+      <button class="btn-secondary" onclick="editarDescricao()">✏️ Editar descrição</button>
+      <button class="btn-primary-action" style="background:${cor};border-color:${cor}" onclick="salvarDescricaoAtual()">💾 ${salvo ? 'Salvar novamente' : 'Salvar como padrão'}</button>
+      <button class="btn-secondary" onclick="gerarNovamenteComIA()">✨ Gerar nova com IA</button>
+      <button class="btn-print" style="border-color:${cor};color:${cor}" onclick="window.print()">🖨️ Imprimir</button>
+      ${salvo ? '<button class="btn-danger" onclick="excluirDescricaoSalva()">🗑️ Excluir salvo</button>' : ''}`;
+
+  document.getElementById('doc-wrap').innerHTML = `
+    <div class="doc" id="doc-content">
+      <div class="doc-header" style="border-bottom-color:${cor}">
+        <div>
+          <div class="doc-main-title">DESCRIÇÃO DE FUNÇÃO ${salvo ? '<span class="saved-badge">✓ Salva</span>' : ''}</div>
+          <div class="doc-empresa-name">Perfil profissional · Portfólio</div>
+        </div>
+      </div>
+
+      <div class="sec-head" style="background:${cor}">Identificação</div>
+      ${identificacaoHtml}
+
+      <div class="sec-head" style="background:${cor}">Objetivo do Cargo</div>
+      ${objetivoHtml}
+
+      <div class="sec-head" style="background:${cor}">Responsabilidades</div>
+      ${responsabilidadesHtml}
+
+      <div class="sec-head" style="background:${cor}">Requisitos Mínimos</div>
+      ${requisitosHtml}
+
+      <div class="doc-footer">
+        <div><strong>Atualizado em:</strong><br>${today()}</div>
+        <div><strong>Impresso em:</strong><br>${today()}</div>
+        <div class="doc-footer-brand">
+          <div class="doc-footer-brand-copy"><strong>GESTÃO DE GENTE</strong><br>Cargos e Salários</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">${botoesHtml}</div>
+    ${editar ? '<div class="edit-note">Você pode alterar qualquer campo abaixo, remover responsabilidades no × e incluir novas pelo botão “Adicionar responsabilidade”.</div>' : ''}
+
+    <div class="analysis-toolbar">
+      <button id="btn-complexity-toggle" class="btn-analysis-toggle" type="button" onclick="toggleComplexidade()">🧠 Mostrar Complexidade do Cargo</button>
+      <button id="btn-salary-toggle" class="btn-analysis-toggle" type="button" onclick="toggleSalario()">💰 Mostrar Pesquisa Salarial</button>
+      <button id="btn-grading-toggle" class="btn-analysis-toggle" type="button" onclick="toggleGrading()">📊 Mostrar Grading Korn Ferry / Mercer</button>
+    </div>
+
+    <div class="complexity-panel-wrap is-hidden" id="complexity-panel-wrap">${complexityHtml}</div>
+
+    ${salaryHtml}
+
+    <div class="grading-panel is-hidden" id="grading-panel">
+      <div class="grading-title">
+        <span class="grading-icon">📊</span>
+        Grading de Mercado
+        <span class="grading-subtitle">Estimativas orientativas — não substituem avaliação oficial/licenciada</span>
+      </div>
+
+      <div class="grading-grid">
+        <div class="grading-section">
+          <div class="grading-section-label" style="color:${cor}"><span>KORN FERRY — HAY</span><span class="grading-method-badge">Estimativa</span></div>
+          <div class="grading-fields">${gradingKfHtml}</div>
+        </div>
+
+        <div class="grading-section">
+          <div class="grading-section-label" style="color:${cor}"><span>MERCER — IPE</span><span class="grading-method-badge">Estimativa</span></div>
+          <div class="grading-fields">${gradingMcHtml}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Reaplica o estado visual dos painéis depois que o documento foi recriado.
+  // Isso impede que Pesquisa Salarial, Complexidade ou Grading fechem após recalcular.
+  setTimeout(() => aplicarEstadoPaineisAnalise(), 0);
+}
+
+
+</script>
+<script>
+/* js/impressao.js */
+/*
+  gerarPDF: abre uma janela popup com o documento formatado para A4,
+  dispara window.print() automaticamente e fecha após a impressão.
+  Usa o mesmo CSS de @media print que já existe — resultado idêntico
+  ao botão Imprimir, mas em popup separado (sem interferir na página).
+*/
+
+function gerarPDF(botao) {
+  // Coleta o HTML do documento gerado
+  const docEl = document.getElementById('doc-content');
+  if (!docEl) return;
+
+  // Monta o nome sugerido para o arquivo
+  const cargo = (document.getElementById('cargo-input').value || 'Descricao_de_Funcao')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  const empresa = (empresaAtual?.nome || 'Empresa')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  const nomeArquivo = 'Descricao_de_Funcao_' + (cargo || 'Cargo');
+
+  // Extrai todo o CSS inline da página
+  const cssTexto = Array.from(document.styleSheets)
+    .filter(ss => { try { return ss.cssRules; } catch(e) { return false; } })
+    .map(ss => Array.from(ss.cssRules).map(r => r.cssText).join('\n'))
+    .join('\n');
+
+  // Monta HTML completo da janela de impressão
+  const htmlPopup = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>${nomeArquivo}</title>
+${linksCSSDaPagina()}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+${cssTexto}
+/* Forçar modo impressão: esconder tudo exceto o doc */
+body { background: #fff !important; margin: 0; padding: 0; }
+.btn-row { display: none !important; }
+@page { size: A4 portrait; margin: 12mm; }
+</style>
+</head>
+<body>
+<div class="doc-wrap" style="margin:0;padding:0;max-width:100%">
+${docEl.outerHTML}
+</div>
+<script>
+  // Remove botões dentro do popup
+  document.querySelectorAll('.btn-row, .btn-print').forEach(el => el.remove());
+  // Aguarda fontes e imagens, depois imprime
+  Promise.all([
+    document.fonts ? document.fonts.ready : Promise.resolve(),
+    new Promise(resolve => {
+      const imgs = document.querySelectorAll('img');
+      if (!imgs.length) return resolve();
+      let count = imgs.length;
+      imgs.forEach(img => {
+        if (img.complete) { if (--count === 0) resolve(); }
+        else {
+          img.onload = img.onerror = () => { if (--count === 0) resolve(); };
+        }
+      });
+    })
+  ]).then(() => {
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => window.close(), 500);
+    }, 300);
+  });
+<\/script>
+</body>
+</html>`;
+
+  // Abre popup e escreve o HTML
+  const popup = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+  if (!popup) {
+    // Fallback: se popup bloqueado, usa print da própria página
+    setStatus('⚠ Popup bloqueado pelo navegador. Usando impressão da página...');
+    window.print();
+    return;
+  }
+  setStatus('📄 Gerando PDF — aguarde o diálogo de impressão...');
+  popup.document.open();
+  popup.document.write(htmlPopup);
+  popup.document.close();
+
+  // Limpa status quando o popup fechar
+  const timer = setInterval(() => {
+    if (popup.closed) {
+      clearInterval(timer);
+      setStatus('');
+    }
+  }, 500);
+}
+
+</script>
+<script>
+/* js/portfolio.js */
+// Conteúdo inteiramente fictício para demonstração pública; não é salvo automaticamente.
+function carregarExemploPortfolio() {
+  if (modoEdicao && !confirm('Descartar a edição atual e abrir o exemplo fictício?')) return;
+  const d = {
+    cargo:'Analista de Projetos Pleno', departamento:'Projetos e Processos',
+    objetivo:'Apoiar o planejamento e a execução de projetos, conectando equipes, acompanhando entregas e transformando informações em decisões claras.',
+    responsabilidades:[
+      'Estruturar cronogramas e acompanhar prazos, dependências e entregas dos projetos.',
+      'Consolidar indicadores e preparar relatórios de acompanhamento para as partes interessadas.',
+      'Facilitar reuniões de alinhamento, registrar decisões e acompanhar planos de ação.',
+      'Identificar riscos e propor melhorias nos processos de trabalho.',
+      'Manter a documentação dos projetos atualizada e acessível à equipe.'
+    ],
+    formacao:'Graduação em Administração, Engenharia, Tecnologia ou áreas relacionadas.',
+    experiencia:'Experiência em acompanhamento de projetos e colaboração com equipes de diferentes áreas.',
+    conhecimentos:'Planejamento de projetos, indicadores de desempenho, planilhas, comunicação e métodos ágeis.',
+    grading:{}, salario:null
+  };
+  d.complexidade=complexidadeFallback(d);
+  descricaoAntesDaEdicao=null;
+  descricaoAtual=d; cargoConsultaAtual=d.cargo; modoEdicao=false;
+  Object.keys(estadoPaineisAnalise).forEach(k=>estadoPaineisAnalise[k]=false);
+  document.getElementById('cargo-input').value=d.cargo;
+  renderDoc(d);
+  setStatus('Exemplo fictício de portfólio. Você pode editar, explorar as análises e salvar no seu navegador.');
+}
+
+</script>
+<script>
+/* js/app.js */
+document.getElementById('cargo-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') gerar();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('organize-modal').classList.contains('open')) fecharOrganizar();
+    else if (document.getElementById('folder-modal').classList.contains('open')) fecharCriarPasta();
+    else if (document.getElementById('library-modal').classList.contains('open')) fecharBiblioteca();
+    else if (document.getElementById('context-modal').classList.contains('open')) fecharContexto();
+  }
+  if (e.key === 'Enter' && e.ctrlKey && document.getElementById('context-modal').classList.contains('open')) salvarContexto();
+});
+
+// init
+selectEmpresa('portfolio');
+atualizarStatusChave();
+atualizarBadgeBiblioteca();
+
+
+</script>
+</body>
+</html>
