@@ -8,7 +8,7 @@
   <meta property="og:title" content="Descrição de Cargos | Marcos Davi">
   <meta property="og:description" content="Da definição do cargo à descrição organizada: conheça o projeto e suas telas.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=video-demo">
   <script src="vitrine.js" defer></script>
 </head>
 <body>
@@ -53,10 +53,18 @@
     <section class="secao demonstracao" id="demonstracao">
       <div class="demonstracao-cabecalho">
         <div>
-          <p class="rotulo">O PROJETO EM IMAGENS</p>
+          <p class="rotulo">O PROJETO EM VÍDEO E IMAGENS</p>
           <h2>Da descrição à análise de cargos e salários.</h2>
         </div>
-        <p>As imagens mostram telas reais da aplicação, preenchidas com exemplos fictícios. Navegue pelas etapas para entender como cada recurso funciona.</p>
+        <p>Assista ao vídeo para uma visão geral e navegue pelas imagens para conhecer cada recurso. Os exemplos utilizam dados fictícios.</p>
+      </div>
+      <div class="video-demo">
+        <h3>Vídeo de demonstração</h3>
+        <video controls playsinline preload="metadata" poster="video-capa.png" aria-label="Vídeo de apresentação da Descrição de Cargos">
+          <source src="video-demonstracao.mp4" type="video/mp4">
+          Seu navegador não suporta vídeo. <a href="video-demonstracao.mp4">Baixar o vídeo de demonstração</a>.
+        </video>
+        <p>Apresentação do projeto com informações fictícias.</p>
       </div>
       <div class="demo-controles" role="tablist" aria-label="Telas do projeto">
         <button id="aba-descricao" class="demo-aba ativa" type="button" role="tab" aria-selected="true" aria-controls="painel-tela" tabindex="0" data-imagem="descricao.png" data-titulo="Descrição do cargo" data-texto="Objetivo, responsabilidades e requisitos reunidos em um documento estruturado, que pode ser revisado antes de salvar.">Descrição</button>
